@@ -1,15 +1,21 @@
 version: '3.1'
 services:
   stats-server:
+    build: stats/stats-server
     ports:
       - "9090:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/postgres
+      - SPRING.DATASOURCE.USERNAME=diplom
+      - SPRING.DATASOURCE.PASSWORD=diplom
 
   stats-db:
-    image: postgres:14-alpine
-
-  ewm-service:
+    image: postgres:13.7-alpine
     ports:
-      - "8080:8080"
-
-  ewm-db:
-    image: postgres:14-alpine
+      - "6060:5432"
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=diplom
+      - POSTGRES_PASSWORD=diplom
