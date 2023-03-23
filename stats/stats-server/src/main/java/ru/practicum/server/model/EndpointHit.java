@@ -27,5 +27,4 @@ public class EndpointHit {
 
     @Timestamp
     private LocalDateTime timestamp;
-
 }
