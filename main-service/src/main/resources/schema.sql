@@ -50,7 +50,8 @@ create table if not exists events
     state              varchar(255),
     title              varchar(120),
     published_on       timestamp,
-    category_id        bigint
+    category_id        bigint,
+    views              integer
         constraint fko6mla8j1p5bokt4dxrlmgwc28
             references categories,
     user_id            bigint

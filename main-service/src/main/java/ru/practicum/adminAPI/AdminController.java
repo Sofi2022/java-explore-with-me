@@ -88,7 +88,7 @@ public class AdminController {
     List<String> states, @RequestParam(name = "categories") List<Long> categories, @RequestParam(name = "rangeStart")
                                            String rangeStart, @RequestParam(name = "rangeEnd")
     String rangeEnd, @RequestParam(name = "from",
-            defaultValue = "0", required = false) Integer from, @RequestParam(name = "size", required = false) Integer size) {
-        return null;
+            defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size);
     }
 }
