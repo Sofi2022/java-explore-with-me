@@ -1,9 +1,8 @@
-package ru.practicum.categories.dto;
+package ru.practicum.locations.dto;
 
 import lombok.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Valid
@@ -11,11 +10,12 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDto {
+@Builder
+public class LocationDto {
 
     @NotNull
-    private Long id;
+    private Float lat;
 
-    @NotBlank
-    private String name;
+    @NotNull
+    private Float lon;
 }

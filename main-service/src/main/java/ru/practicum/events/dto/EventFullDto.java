@@ -3,10 +3,13 @@ package ru.practicum.events.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jdk.jfr.Timestamp;
 import lombok.*;
-import ru.practicum.Location;
 import ru.practicum.categories.dto.CategoryDto;
+import ru.practicum.locations.dto.LocationDto;
+import ru.practicum.locations.model.Location;
+import ru.practicum.categories.model.Category;
 import ru.practicum.state.State;
 import ru.practicum.user.dto.UserShortDto;
+import ru.practicum.user.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -16,8 +19,9 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class Event {
+@ToString
+//@Builder
+public class EventFullDto {
 
     private Long id;
 
@@ -38,7 +42,7 @@ public class Event {
 
     private UserShortDto initiator;
 
-    private Location location;
+    private LocationDto location;
 
     private Boolean paid;
 

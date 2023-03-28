@@ -8,6 +8,9 @@ import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.dto.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.events.dto.EventFullDto;
+import ru.practicum.events.dto.UpdateEventAdminRequest;
+import ru.practicum.events.service.EventService;
 import ru.practicum.user.dto.NewUserRequestDto;
 import ru.practicum.user.dto.UserDto;
 import ru.practicum.user.service.UserService;
@@ -24,6 +27,8 @@ public class AdminController {
     private final UserService userService;
 
     private final CategoriesService categoriesService;
+
+    private final EventService eventService;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -71,4 +76,19 @@ public class AdminController {
         return categoriesService.update(category, catId);
     }
 
+
+    @PatchMapping("events/{eventId}")
+    public EventFullDto updateEventByAdmin(@PathVariable Long eventId, @Valid @RequestBody UpdateEventAdminRequest event) {
+        log.info("Вызван метод updateEventByAdmin " + eventId);
+        return eventService.updateEventByAdmin(eventId, event);
+    }
+
+    @GetMapping("/events")
+    public List<EventFullDto> searchEvents(@RequestParam(name = "users") List<Long> userIds, @RequestParam(name = "states")
+    List<String> states, @RequestParam(name = "categories") List<Long> categories, @RequestParam(name = "rangeStart")
+                                           String rangeStart, @RequestParam(name = "rangeEnd")
+    String rangeEnd, @RequestParam(name = "from",
+            defaultValue = "0", required = false) Integer from, @RequestParam(name = "size", required = false) Integer size) {
+        return null;
+    }
 }

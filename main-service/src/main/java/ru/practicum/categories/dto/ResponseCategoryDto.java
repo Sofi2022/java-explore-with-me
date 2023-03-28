@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class ResponseCategoryDto {
 
     @NotNull

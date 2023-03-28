@@ -8,8 +8,8 @@ import javax.persistence.*;
 @Setter
 @ToString
 @AllArgsConstructor
-@RequiredArgsConstructor
-@Builder
+@NoArgsConstructor
+//@RequiredArgsConstructor
 @Entity
 @Table(name = "categories")
 public class Category {

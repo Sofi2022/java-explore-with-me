@@ -19,4 +19,12 @@ public class ErrorHandler {
         log.warn(String.valueOf(result), exception);
         return result;
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> handleAlreadyExistsException(RequestAlreadyExists exception) {
+        Map<String, String> result = Map.of("Нельзя добавить повторный запрос", exception.getMessage());
+        log.warn(String.valueOf(result), exception);
+        return result;
+    }
 }

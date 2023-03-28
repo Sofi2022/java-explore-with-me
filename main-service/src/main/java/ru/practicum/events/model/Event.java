@@ -1,9 +1,11 @@
-package ru.practicum.events;
+package ru.practicum.events.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jdk.jfr.Timestamp;
 import lombok.*;
-import ru.practicum.Location;
+import ru.practicum.locations.model.Location;
 import ru.practicum.categories.model.Category;
+import ru.practicum.state.State;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;
@@ -14,8 +16,9 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @AllArgsConstructor
-@RequiredArgsConstructor
-@Builder
+@NoArgsConstructor
+//@RequiredArgsConstructor
+//@Builder
 @Entity
 @Table(name = "events")
 public class Event {
@@ -24,17 +27,18 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Size(min = 20, max = 200)
+    @Size(min = 20, max = 2000)
     private String annotation;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id")
     private Category category;
 
-   // private Integer confirmedRequests;
+    private Integer confirmedRequests;
 
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    private LocalDateTime createdOn;
+    @Timestamp
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
 
     @Size(min = 20, max = 7000)
     private String description;
@@ -42,11 +46,11 @@ public class Event {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User initiator;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     private Location location;
 
@@ -61,4 +65,11 @@ public class Event {
 
     @Size(min = 3, max = 120)
     private String title;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime publishedOn;
+
+    @Column(name = "state")
+    @Enumerated(EnumType.STRING)
+    private State state;
 }

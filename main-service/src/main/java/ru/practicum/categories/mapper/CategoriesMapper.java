@@ -1,6 +1,7 @@
 package ru.practicum.categories.mapper;
 
 import org.mapstruct.Mapper;
+import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.dto.NewCategoryDto;
 import ru.practicum.categories.model.Category;
@@ -15,4 +16,6 @@ public interface CategoriesMapper {
     Category toCategory(NewCategoryDto category);
 
     List<ResponseCategoryDto> toListDto(List<Category> categories);
+
+    CategoryDto toCatDto(Category category);
 }

@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.locations.model;
 
 import lombok.*;
 
@@ -8,7 +8,8 @@ import javax.persistence.*;
 @Setter
 @ToString
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
+//@RequiredArgsConstructor
 @Builder
 @Entity
 @Table(name = "locations")
