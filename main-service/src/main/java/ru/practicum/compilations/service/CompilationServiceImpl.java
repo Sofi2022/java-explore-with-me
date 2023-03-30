@@ -31,9 +31,13 @@ public class CompilationServiceImpl implements CompilationService {
         if (compilation.getEvents().size() != 0) {
             List<Long> eventIds = compilation.getEvents();
             List<Event> events = eventIds.stream().map(eventService::getEventById).collect(Collectors.toList());
+            System.out.println("EVENTLIST: " + events);
             Compilation fromDto = compilationsMapper.toModel(compilation, events);
+            System.out.println("fromDto: " + fromDto);
             Compilation savedCompil = compilationsRepository.save(fromDto);
+            System.out.println("savedCompil: " + savedCompil);
             CompilationDto result = compilationsMapper.toDto(savedCompil);
+            System.out.println("result: " + result);
             return result;
         }
         Compilation fromDto = compilationsMapper.toModel(compilation, null);

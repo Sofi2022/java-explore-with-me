@@ -22,6 +22,5 @@ public class CompilationDto {
 
     private String title;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Event> events;
 }

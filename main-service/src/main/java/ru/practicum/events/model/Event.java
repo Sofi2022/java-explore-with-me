@@ -31,8 +31,8 @@ public class Event {
     @Size(min = 20, max = 2000)
     private String annotation;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     private Integer confirmedRequests;
@@ -62,7 +62,7 @@ public class Event {
     private Integer participantLimit; // ограничение мест
 
     @Column(columnDefinition = "boolean default true")
-    private Boolean requestModeration; //Нужна ли пре-модерация заявок на участие.true -ожидать подтверждения
+    private Boolean requestModeration;
 
     @Size(min = 3, max = 120)
     private String title;
@@ -75,10 +75,4 @@ public class Event {
     private State state;
 
     private Long views;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "compilation")
-//    @JsonBackReference
-//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-//    private Compilation compilation;
 }
