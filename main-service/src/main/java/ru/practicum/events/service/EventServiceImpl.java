@@ -3,17 +3,14 @@ package ru.practicum.events.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
 import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
-import ru.practicum.events.dto.EventShortDto;
-import ru.practicum.events.dto.UpdateEventAdminRequest;
+import ru.practicum.events.dto.*;
+import ru.practicum.events.mapper.EventsUpdateMapper;
 import ru.practicum.events.model.Event;
-import ru.practicum.events.dto.EventFullDto;
-import ru.practicum.events.dto.NewEventDto;
 import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.repository.EventsRepository;
 import ru.practicum.locations.dto.LocationDto;
@@ -31,8 +28,8 @@ import ru.practicum.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +51,8 @@ public class EventServiceImpl implements EventService {
     private final UserMapper userMapper;
 
     private final CategoriesMapper categoriesMapper;
+
+    private final EventsUpdateMapper eventsUpdateMapper;
 
 
     @Override
@@ -110,7 +109,7 @@ public class EventServiceImpl implements EventService {
             eventFromDb.setState(State.CANCELED);
         }
 
-        Event event1 = eventsMapper.updateEvent(event, eventFromDb);
+        Event event1 = eventsUpdateMapper.updateEventByAdmin(event, eventFromDb);
         Event event2 = eventsRepository.save(eventFromDb);
         result = eventsMapper.toDto(eventFromDb);
         System.out.println("RESULT: " + result);
@@ -151,11 +150,10 @@ public class EventServiceImpl implements EventService {
 
 
     @Override
-    public List<EventFullDto> getEventsByUser(Long userId, Long eventId) {
+    public EventFullDto getEventByUser(Long userId, Long eventId) {
         validateUser(userId);
-        validateEvent(eventId);
-        List<Event> events = eventsRepository.findAllByUser(userId, eventId);
-        return eventsMapper.toListFullDto(events);
+        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого пользователя нет " + userId));
+        return eventsMapper.toDto(event);
     }
 
 
@@ -220,6 +218,49 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
         return eventsMapper.toListShortDto(result);
+    }
+
+
+    @Override
+    public EventFullDto getFullEventById(Long eventId) {
+        Optional<Event> event = eventsRepository.findEventByIdAndStatePublished(eventId);
+        if (event.isEmpty()) {
+            throw new NotFoundException("Такого события нет " + eventId);
+        } else {
+            return eventsMapper.toDto(event.get());
+        }
+    }
+
+    @Override
+    public EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest event) {
+        Event eventFromDb = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException(
+                "Такого события нет " + eventId));
+        if (eventFromDb.getState().equals(State.CANCELED) || eventFromDb.getState().equals(State.PENDING)) {
+            if (event.getEventDate() != null && event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+                throw new RequestAlreadyExists("Дата и время на которые намечено событие не может быть раньше, " +
+                        "чем через два часа от текущего момента ");
+            }
+            if (event.getStateAction().equals("SEND_TO_REVIEW")) {
+                eventFromDb.setState(State.PENDING);
+            }
+            if (event.getStateAction().equals("CANCEL_REVIEW")) {
+                eventFromDb.setState(State.CANCELED);
+            }
+        } else {
+            throw new RequestAlreadyExists("Изменить можно только отмененные события или события в состоянии ожидания модерации, " +
+                    "статус события = " + eventFromDb.getState());
+        }
+
+        Event event1 = eventsUpdateMapper.updateEventByUser(event, eventFromDb);
+        Event event2 = eventsRepository.save(eventFromDb);
+        return eventsMapper.toDto(eventFromDb);
+    }
+
+
+    @Override
+    public Event getEventById(Long eventId) {
+        return eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException(
+                "Такого события нет " + eventId));
     }
 
     private void validateUser(Long userId) {

@@ -26,22 +26,10 @@ public interface EventsMapper {
 
     EventFullDto toDto(Event event);
 
-    @Mapping(target = "category.id", source = "eventUpdateDto.category", nullValuePropertyMappingStrategy =
-            NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "annotation", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "category", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "eventDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "location", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "paid", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "participantLimit", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "requestModeration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "eventUpdateDto.stateAction", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "title", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Event updateEvent(UpdateEventAdminRequest eventUpdateDto, @MappingTarget Event event);
-
     List<EventFullDto> toListFullDto(List<Event> events);
 
     EventShortDto toShortDto(Event event);
     List<EventShortDto> toListShortDto(List<Event> events);
+
+    List<Event> toEventList(List<EventFullDto> events);
 }

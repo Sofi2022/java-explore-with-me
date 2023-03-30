@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.service.EventService;
 
@@ -23,11 +24,13 @@ public class PublicController {
     @GetMapping("/categories")
     public List<ResponseCategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
                                                    @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Public: Вызван метод getCategories, from, size {} {}", from, size);
         return categoriesService.getCategories(from, size);
     }
 
     @GetMapping("/categories/{catId}")
     public ResponseCategoryDto getCategoryById(@PathVariable Long catId) {
+        log.info("Public: Вызван метод getCategoryById, catId {}", catId);
         return categoriesService.getCategoryById(catId);
     }
 
@@ -43,6 +46,14 @@ public class PublicController {
                                                      String sort, @RequestParam(name = "from", defaultValue = "0")
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
                                                      Integer size) {
+        log.info("Public: Вызван метод getEventsFiltered");
         return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+    }
+
+
+    @GetMapping("events/{id}")
+    public EventFullDto getFullEventById(@PathVariable Long id) {
+        log.info("Public: Вызван метод getCategoryById, id {}", id);
+        return eventService.getFullEventById(id);
     }
 }

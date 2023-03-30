@@ -11,6 +11,7 @@ import ru.practicum.state.State;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventsRepository extends JpaRepository<Event, Long> {
@@ -34,14 +35,9 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
     @Query("select e from Event e join e.initiator join e.category where e.initiator.id = :userId")
     Page<Event> findAllByUserWithPage(@Param("userId") Long userId, PageRequest pageRequest);
 
+    @Query("select e from Event e where e.id = :id and e.state ='PUBLISHED'")
+    Optional<Event> findEventByIdAndStatePublished(@Param("id") Long eventId);
 
-//    @Query("select e from Event e join e.category where e.category.id in :categoriesIds and lower(e.description) " +
-//            "like lower(:text) or lower(e.annotation) like (:text) and e.paid = false and e.eventDate between :start and " +
-//            ":end order by e.eventDate asc")
-//    Page<Event> findAllEventsFilteredWithCategoriesAndDateTimeAsc(PageRequest pageRequest, @Param("text") String text, @Param("categoriesIds") List<Long> categoriesIds,
-//                                          @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
-
-    // РАБОЧИЙ ВАРИАНТ
 
     @Query("select e from Event e join e.category where lower(e.annotation) like lower(:text) or lower(e.description) " +
             "like lower(:text) and e.category.id in :categoriesIds and e.eventDate between :start and " +

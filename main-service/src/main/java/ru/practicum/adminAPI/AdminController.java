@@ -8,6 +8,9 @@ import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.dto.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.compilations.dto.CompilationDto;
+import ru.practicum.compilations.dto.NewCompilationDto;
+import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
 import ru.practicum.events.service.EventService;
@@ -30,10 +33,12 @@ public class AdminController {
 
     private final EventService eventService;
 
+    private final CompilationService compilService;
+
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@RequestBody @Valid NewUserRequestDto user) {
-        log.info("Вызван метод addUser");
+        log.info("Admin: Вызван метод addUser");
         return userService.addUser(user);
     }
 
@@ -41,7 +46,7 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam (name = "ids") List<Long> userIds, @RequestParam(name = "from", defaultValue = "0")
     Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Вызван метод getUsers {}, size {}, from {}", userIds, from, size);
+        log.info("Admin: Вызван метод getUsers {}, size {}, from {}", userIds, from, size);
         return userService.getUsers(userIds, from, size);
     }
 
@@ -49,7 +54,7 @@ public class AdminController {
     @DeleteMapping("/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long userId) {
-        log.info("Вызван метод deleteUser " + userId);
+        log.info("Admin: Вызван метод deleteUser " + userId);
         userService.deleteUser(userId);
     }
 
@@ -57,7 +62,7 @@ public class AdminController {
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseCategoryDto addCategory(@RequestBody @Valid NewCategoryDto category) {
-        log.info("Вызван метод addCategory");
+        log.info("Admin: Вызван метод addCategory");
         return categoriesService.addCategory(category);
     }
 
@@ -65,21 +70,21 @@ public class AdminController {
     @DeleteMapping("/categories/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable Long catId) {
-        log.info("Вызван метод deleteCategory " + catId);
+        log.info("Admin: Вызван метод deleteCategory " + catId);
         categoriesService.deleteCategory(catId);
     }
 
 
-    @PatchMapping("/categories{catId}")
+    @PatchMapping("/categories/{catId}")
     public ResponseCategoryDto updateCategory(@Valid @RequestBody CategoryDto category, @PathVariable Long catId) {
-        log.info("Вызван метод updateCategory " + catId);
+        log.info("Admin: Вызван метод updateCategory " + catId);
         return categoriesService.update(category, catId);
     }
 
 
     @PatchMapping("events/{eventId}")
     public EventFullDto updateEventByAdmin(@PathVariable Long eventId, @Valid @RequestBody UpdateEventAdminRequest event) {
-        log.info("Вызван метод updateEventByAdmin " + eventId);
+        log.info("Admin: Вызван метод updateEventByAdmin " + eventId);
         return eventService.updateEventByAdmin(eventId, event);
     }
 
@@ -89,6 +94,14 @@ public class AdminController {
                                            String rangeStart, @RequestParam(name = "rangeEnd")
     String rangeEnd, @RequestParam(name = "from",
             defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Admin: Вызван метод searchEvents ");
         return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size);
+    }
+
+
+    @PostMapping("/compilations")
+    public CompilationDto addCompilation(@Valid @RequestBody NewCompilationDto compilation) {
+        log.info("Admin: Вызван метод addCompilation ");
+        return compilService.addCompilation(compilation);
     }
 }

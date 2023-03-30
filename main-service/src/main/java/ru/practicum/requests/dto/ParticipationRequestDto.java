@@ -15,6 +15,7 @@ import javax.validation.Valid;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class ParticipationRequestDto {
 
     private Long id;

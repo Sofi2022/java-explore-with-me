@@ -13,9 +13,6 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class CategoryDto {
 
-    @NotNull
-    private Long id;
-
     @NotBlank
     private String name;
 }

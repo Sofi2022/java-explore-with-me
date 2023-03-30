@@ -5,11 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.events.dto.EventFullDto;
-import ru.practicum.events.dto.EventShortDto;
-import ru.practicum.events.model.Event;
-import ru.practicum.events.dto.NewEventDto;
+import ru.practicum.events.dto.*;
 import ru.practicum.events.service.EventService;
+import ru.practicum.requests.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.requests.dto.EventRequestStatusUpdateResult;
 import ru.practicum.requests.dto.ParticipationRequestDto;
 import ru.practicum.requests.service.RequestService;
 
@@ -30,6 +29,7 @@ public class PrivateController {
     @PostMapping("users/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto createEvent(@PathVariable Long userId, @Valid @RequestBody NewEventDto event) {
+        log.info("Private: Вызван метод createEvent, userId {} ", userId);
         return eventService.createEvent(userId, event);
     }
 
@@ -37,17 +37,57 @@ public class PrivateController {
     @PostMapping("users/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public ParticipationRequestDto addRequest(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
-        return requestService.addRequest(userId, eventId);
+        log.info("Private: Вызван метод addRequest, userId {}", userId);
+        ParticipationRequestDto result = requestService.addRequest(userId, eventId);
+        System.out.println("RESULT= " + result);
+        return result;
     }
 
     @GetMapping("users/{userId}/events/{eventId}")
-    public List<EventFullDto> getEventsByUser(@PathVariable Long userId, @PathVariable Long eventId) {
-        return eventService.getEventsByUser(userId, eventId);
+    public EventFullDto getEventByUser(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("Private: Вызван метод getEventByUser, userId, eventId {} {}", userId, eventId);
+        return eventService.getEventByUser(userId, eventId);
     }
 
     @GetMapping("users/{userId}/events")
     public List<EventShortDto> getEventsByUserWithPage(@PathVariable Long userId, @RequestParam(name = "from",
             defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Private: Вызван метод getEventsByUserWithPage, userId, from, size {} {} {}", userId, from, size);
         return eventService.getEventsByUserWithPage(userId, from, size);
+    }
+
+
+    @GetMapping("users/{userId}/requests")
+    List<ParticipationRequestDto> getUserRequestsInForeignEvents(@PathVariable Long userId) {
+        log.info("Private: Вызван метод getUserRequestsInForeignEvents, userId {}", userId);
+        return requestService.getUserRequestsInForeignEvents(userId);
+    }
+
+    @GetMapping("users/{userId}/events/{eventId}/requests")
+    public List<ParticipationRequestDto> getUserRequestsInEvent(@PathVariable Long userId, @PathVariable Long eventId) {
+        log.info("Private: Вызван метод getUserRequestsInEvent, userId eventId {} {}", userId, eventId);
+        return requestService.getUserRequestsInEvent(userId, eventId);
+    }
+
+    @PatchMapping("/users/{userId}/events/{eventId}")
+    public EventFullDto updateEventByUser(@PathVariable Long userId, @PathVariable Long eventId, @Valid @RequestBody
+    UpdateEventUserRequest event) {
+        log.info("Private: Вызван метод updateEventByUser, userId eventId {} {}", userId, eventId);
+        return eventService.updateEventByUser(userId, eventId, event);
+    }
+
+
+    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelRequestByUser(@PathVariable Long userId, @PathVariable Long requestId) {
+        log.info("Private: Вызван метод cancelRequestByUser, userId requestId {} {}", userId, requestId);
+        return requestService.cancelRequestByUser(userId, requestId);
+    }
+
+
+    @PatchMapping("users/{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult confirmOrRejectRequestsByUser(@PathVariable Long userId, @PathVariable
+    Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest request) {
+        log.info("Private: Вызван метод confirmOrRejectRequestsByUser, userId eventId {} {}", userId, eventId);
+        return requestService.confirmOrRejectRequestsByUser(userId, eventId, request);
     }
 }

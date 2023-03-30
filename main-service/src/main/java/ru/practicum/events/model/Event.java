@@ -1,8 +1,11 @@
 package ru.practicum.events.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Timestamp;
 import lombok.*;
+import ru.practicum.compilations.model.Compilation;
 import ru.practicum.locations.model.Location;
 import ru.practicum.categories.model.Category;
 import ru.practicum.state.State;
@@ -17,8 +20,6 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-//@RequiredArgsConstructor
-//@Builder
 @Entity
 @Table(name = "events")
 public class Event {
@@ -74,4 +75,10 @@ public class Event {
     private State state;
 
     private Long views;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "compilation")
+//    @JsonBackReference
+//    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//    private Compilation compilation;
 }

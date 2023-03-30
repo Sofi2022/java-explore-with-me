@@ -1,10 +1,7 @@
 package ru.practicum.events.service;
 
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.practicum.events.dto.EventFullDto;
-import ru.practicum.events.dto.EventShortDto;
-import ru.practicum.events.dto.NewEventDto;
-import ru.practicum.events.dto.UpdateEventAdminRequest;
+import ru.practicum.events.dto.*;
+import ru.practicum.events.model.Event;
 
 import java.util.List;
 
@@ -16,10 +13,16 @@ public interface EventService {
 
     List<EventFullDto> searchEvents(List<Long> userIds, List<String> states, List<Long> categories, String rangeStart,
                                     String rangeEnd, Integer from, Integer size);
-    List<EventFullDto> getEventsByUser(Long userId, Long eventId);
+    EventFullDto getEventByUser(Long userId, Long eventId);
 
     List<EventShortDto> getEventsByUserWithPage(Long userId, Integer from, Integer size);
 
     List<EventShortDto> getEventsFiltered(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
                                           String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size);
+
+    EventFullDto getFullEventById(Long eventId);
+
+    EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest event);
+
+    Event getEventById(Long eventId);
 }
