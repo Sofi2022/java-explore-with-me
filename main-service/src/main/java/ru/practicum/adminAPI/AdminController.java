@@ -10,12 +10,13 @@ import ru.practicum.categories.dto.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
 import ru.practicum.compilations.dto.CompilationDto;
 import ru.practicum.compilations.dto.NewCompilationDto;
+import ru.practicum.compilations.dto.UpdateCompilationRequest;
 import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.UpdateEventAdminRequest;
 import ru.practicum.events.service.EventService;
-import ru.practicum.user.dto.NewUserRequestDto;
-import ru.practicum.user.dto.UserDto;
+import ru.practicum.user.NewUserRequestDto;
+import ru.practicum.user.UserDto;
 import ru.practicum.user.service.UserService;
 
 import javax.validation.Valid;
@@ -100,8 +101,24 @@ public class AdminController {
 
 
     @PostMapping("/compilations")
+    @ResponseStatus(HttpStatus.CREATED)
     public CompilationDto addCompilation(@Valid @RequestBody NewCompilationDto compilation) {
         log.info("Admin: Вызван метод addCompilation ");
         return compilService.addCompilation(compilation);
+    }
+
+
+    @DeleteMapping("/compilations/{compId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCompilation(@PathVariable Long compId) {
+        log.info("Admin: Вызван метод deleteCompilation " + compId);
+        compilService.deleteCompilation(compId);
+    }
+
+
+    @PatchMapping("/compilations/{compId}")
+    public CompilationDto updateCompilation(@PathVariable Long compId, @RequestBody UpdateCompilationRequest compil) {
+        log.info("Admin: Вызван метод updateCompilation " + compId);
+        return compilService.updateCompilation(compId, compil);
     }
 }

@@ -18,7 +18,7 @@ import ru.practicum.locations.mapper.LocationMapper;
 import ru.practicum.locations.model.Location;
 import ru.practicum.locations.LocationRepository;
 import ru.practicum.state.State;
-import ru.practicum.user.dto.UserShortDto;
+import ru.practicum.user.UserShortDto;
 import ru.practicum.user.exception.NotFoundException;
 import ru.practicum.user.exception.RequestAlreadyExists;
 import ru.practicum.user.mapper.UserMapper;
@@ -121,7 +121,6 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> searchEvents(List<Long> userIds, List<String> states, List<Long> categories,
                                            String rangeStart, String rangeEnd, Integer from, Integer size) {
         List<EventFullDto> searchedEvents = new ArrayList<>();
-        //if (from != 0) {
             int page = from / size;
             final PageRequest pageRequest = PageRequest.of(page, size);
             List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());

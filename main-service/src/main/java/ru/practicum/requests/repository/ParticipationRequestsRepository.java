@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ParticipationRequestsRepository extends JpaRepository<ParticipationRequest, Long> {
 
-    @Query("select p from ParticipationRequest p inner join p.requester join fetch p.event where p.requester.id = :userId " +
+    @Query("select p from ParticipationRequest p where p.requester.id = :userId " +
             "and p.event.id = :eventId")
     List<ParticipationRequest> findAllByRequesterIdAndEventId(@Param("userId") Long userId, @Param("eventId") Long eventId);
 

@@ -7,6 +7,7 @@ import ru.practicum.events.model.Event;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,9 +28,8 @@ public class Compilation {
 
     @ManyToMany(fetch = FetchType.LAZY)
             @JoinTable(name = "compilation_events",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "compilation_id")
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
     )
-    //@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private List<Event> events;
+    private Set<Event> events;
 }

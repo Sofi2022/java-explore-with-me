@@ -1,7 +1,6 @@
 package ru.practicum.compilations.dto;
 
 import lombok.*;
-import ru.practicum.events.model.Event;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -21,5 +20,5 @@ public class NewCompilationDto {
     @NotBlank
     private String title;
 
-    private List<Long> events;
+    private Set<Long> events;
 }

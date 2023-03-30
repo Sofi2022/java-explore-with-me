@@ -5,10 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.compilations.dto.CompilationDto;
+import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.events.dto.EventFullDto;
 import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Slf4j
@@ -20,6 +23,8 @@ public class PublicController {
     private final CategoriesService categoriesService;
 
     private final EventService eventService;
+
+    private final CompilationService compilService;
 
     @GetMapping("/categories")
     public List<ResponseCategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
@@ -35,7 +40,7 @@ public class PublicController {
     }
 
 
-    @GetMapping("events")
+    @GetMapping("events")  //ОТПРАВИТЬ ЗАПРОС В СТАТИСТИКУ!
     public List<EventShortDto> getEventsFiltered(@RequestParam(name = "text", required = false) String text,
                                                  @RequestParam(name = "categories", required = false) List<Long> categoriesIds,
                                                  @RequestParam(name = "paid", required = false) Boolean paid,
@@ -45,15 +50,35 @@ public class PublicController {
                                                      Boolean onlyAvailable, @RequestParam(name = "sort", required = false)
                                                      String sort, @RequestParam(name = "from", defaultValue = "0")
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
-                                                     Integer size) {
+                                                     Integer size, HttpServletRequest request) {
         log.info("Public: Вызван метод getEventsFiltered");
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
         return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
 
-    @GetMapping("events/{id}")
-    public EventFullDto getFullEventById(@PathVariable Long id) {
+    @GetMapping("events/{id}") //ОТПРАВИТЬ ЗАПРОС В СТАТИСТИКУ!
+    public EventFullDto getFullEventById(@PathVariable Long id, HttpServletRequest request) {
         log.info("Public: Вызван метод getCategoryById, id {}", id);
+        log.info("client ip: {}", request.getRemoteAddr());
+        log.info("endpoint path: {}", request.getRequestURI());
         return eventService.getFullEventById(id);
+    }
+
+
+    @GetMapping("compilations/{compId}")
+    public CompilationDto getCompilById(@PathVariable Long compId) {
+        log.info("Public: Вызван метод getCompilById, id {}", compId);
+        return compilService.getCompilById(compId);
+    }
+
+
+    @GetMapping("compilations")
+    public List<CompilationDto> getCompilsWithParams(@RequestParam(name = "pinned", required = false) Boolean pinned,
+                                        @RequestParam(name = "from", defaultValue = "0")
+    Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+        log.info("Public: Вызван метод getCompilsWithParams pinned {} from {} size {} ", pinned, from, size);
+        return compilService.getCompilsWithParams(pinned, from, size);
     }
 }

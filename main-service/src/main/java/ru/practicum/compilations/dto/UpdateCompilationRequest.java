@@ -1,10 +1,8 @@
 package ru.practicum.compilations.dto;
 
 import lombok.*;
-import ru.practicum.events.model.Event;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Set;
 
 @Valid
@@ -13,13 +11,11 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CompilationDto {
-
-    private Long id;
+public class UpdateCompilationRequest {
 
     private Boolean pinned;
 
     private String title;
 
-    private Set<Event> events;
+    private Set<Long> events;
 }

@@ -6,7 +6,7 @@ import lombok.*;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.locations.dto.LocationDto;
 import ru.practicum.state.State;
-import ru.practicum.user.dto.UserShortDto;
+import ru.practicum.user.UserShortDto;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
