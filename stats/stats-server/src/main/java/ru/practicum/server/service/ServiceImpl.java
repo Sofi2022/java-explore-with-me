@@ -37,15 +37,13 @@ public class ServiceImpl implements StatService {
     }
 
     @Override
-    public List<ViewStateDto> getStats(String start, String end, List<String> uris, boolean unique) {
+    public List<ViewStateDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         if (unique) {
 
-          List<ViewState> uniqueStates =  statRepository.findAllByTimestampBetweenUnique(LocalDateTime.parse(start, formatter),
-                  LocalDateTime.parse(end, formatter), uris);
+          List<ViewState> uniqueStates =  statRepository.findAllByTimestampBetweenUnique(start, end, uris);
           return uniqueStates.stream().map(viewState -> viewStateMapper.toDto(viewState)).collect(Collectors.toList());
         }
-        List<ViewState> states = statRepository.findAllByTimestampBetween(LocalDateTime.parse(start, formatter),
-                LocalDateTime.parse(end, formatter), uris);
+        List<ViewState> states = statRepository.findAllByTimestampBetween(start, end, uris);
         return states.stream().map(viewState -> viewStateMapper.toDto(viewState)).collect(Collectors.toList());
     }
 }

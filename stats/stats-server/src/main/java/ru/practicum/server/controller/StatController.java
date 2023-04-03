@@ -9,6 +9,9 @@ import ru.practicum.ViewStateDto;
 import ru.practicum.server.service.StatService;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -17,6 +20,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatController {
 
+    public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
     private final StatService service;
 
     @PostMapping("/hit")
@@ -30,6 +35,6 @@ public class StatController {
                                        @RequestParam String end,
                                        @RequestParam(required = false) List<String> uris,
                                        @RequestParam(defaultValue = "false") boolean unique) {
-        return service.getStats(start, end, uris, unique);
+        return service.getStats(LocalDateTime.parse(start, formatter), LocalDateTime.parse(end, formatter), uris, unique);
     }
 }

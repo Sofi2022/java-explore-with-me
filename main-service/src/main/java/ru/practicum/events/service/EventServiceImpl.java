@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import ru.practicum.StateClient;
+import ru.practicum.ViewStateDto;
 import ru.practicum.categories.dto.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
 import ru.practicum.categories.model.Category;
@@ -53,6 +55,11 @@ public class EventServiceImpl implements EventService {
     private final CategoriesMapper categoriesMapper;
 
     private final EventsUpdateMapper eventsUpdateMapper;
+
+    private final StateClient stateClient;
+
+    public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
 
     @Override
@@ -126,8 +133,19 @@ public class EventServiceImpl implements EventService {
             List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-            LocalDateTime start = LocalDateTime.parse(rangeStart, formatter);
-            LocalDateTime end = LocalDateTime.parse(rangeEnd, formatter);
+            LocalDateTime start;
+            if (!(rangeStart.isEmpty())) {
+            start = LocalDateTime.parse(rangeStart, formatter);
+            } else {
+                start = LocalDateTime.now().plusYears(5);
+            }
+
+            LocalDateTime end;
+            if (!(rangeEnd.isEmpty())) {
+            end = LocalDateTime.parse(rangeEnd, formatter);
+            } else {
+            end = LocalDateTime.now().plusYears(5);
+            }
 
             Page<Event> eventsWithPage = null;
 
@@ -145,6 +163,20 @@ public class EventServiceImpl implements EventService {
             } else {
                 return eventsMapper.toListFullDto(resultFromPage);
             }
+    }
+
+    private List<ViewStateDto> getViewsForEvents(String rangeStart, String rangeEnd, List<Event> events) {
+
+        Boolean unique = false;
+
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
+        System.out.println("URIS: " + uris);
+        List<ViewStateDto> statsDTOList = stateClient.getStats(LocalDateTime.parse(rangeStart, formatter),
+                LocalDateTime.parse(rangeEnd, formatter), uris, unique);
+        System.out.println("VIEWS: " + statsDTOList);
+        return statsDTOList;
     }
 
 
@@ -216,6 +248,7 @@ public class EventServiceImpl implements EventService {
             result = eventsFromRepo.stream().filter((event -> event.getConfirmedRequests() < event.getParticipantLimit()))
                     .collect(Collectors.toList());
         }
+        List<ViewStateDto> views = getViewsForEvents(rangeStart, rangeEnd, result);
         return eventsMapper.toListShortDto(result);
     }
 

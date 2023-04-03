@@ -24,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/admin")
+@RequestMapping (path = "/admin")
 @RequiredArgsConstructor
 public class AdminController {
 

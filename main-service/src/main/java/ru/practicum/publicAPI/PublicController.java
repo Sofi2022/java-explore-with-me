@@ -3,6 +3,7 @@ package ru.practicum.publicAPI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.StateClient;
 import ru.practicum.categories.dto.ResponseCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
 import ru.practicum.compilations.dto.CompilationDto;
@@ -12,6 +13,7 @@ import ru.practicum.events.dto.EventShortDto;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -25,6 +27,8 @@ public class PublicController {
     private final EventService eventService;
 
     private final CompilationService compilService;
+
+    private final StateClient stateClient;
 
     @GetMapping("/categories")
     public List<ResponseCategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
@@ -54,6 +58,7 @@ public class PublicController {
         log.info("Public: Вызван метод getEventsFiltered");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
         return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
@@ -63,6 +68,7 @@ public class PublicController {
         log.info("Public: Вызван метод getCategoryById, id {}", id);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
         return eventService.getFullEventById(id);
     }
 
