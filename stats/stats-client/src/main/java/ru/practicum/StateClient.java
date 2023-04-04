@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import ru.practicum.user.NewUserRequestDto;
 import ru.practicum.user.UserDto;
@@ -21,6 +22,7 @@ public class StateClient {
 
     protected final WebClient webClient;
     private final String baseUrl;
+
     public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
@@ -52,18 +54,30 @@ public class StateClient {
     public List<ViewStateDto> getStats(LocalDateTime start,
                                        LocalDateTime end,
                                        List<String> uris,
-                                       boolean unique) {
+                                       Boolean unique) {
         return this.webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/stats")
-                        .queryParam(String.valueOf(start))
-                        .queryParam(String.valueOf(end))
-                        .queryParam(String.valueOf(unique))
-                        .queryParam("uris", String.join(",", uris))
-                        .build())
+                .uri(UriComponentsBuilder.fromHttpUrl("http://localhost:9090")
+                        .pathSegment("stats")
+                        .queryParam("start",  start.format(formatter))
+                        .queryParam("end", end.format(formatter))
+                        .queryParam("uris", uris.toArray(new String[0]))
+                        .queryParam("unique", unique)
+                        .build()
+                        //.encode()
+                        .toUriString())
                 .retrieve()
                 .bodyToFlux(ViewStateDto.class)
                 .collectList()
                 .block();
     }
+                        //.toUriString()
+
+//                        uriBuilder -> uriBuilder
+//                        .path("/stats")
+//                        .queryParam("start", String.valueOf(start))
+//                        .queryParam("end", String.valueOf(end))
+//                        .queryParam(String.valueOf(unique))
+//                        .queryParam("uris", String.join(",", uris))
+//                        .build())
+    //}
 }

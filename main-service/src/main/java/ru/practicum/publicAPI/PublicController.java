@@ -58,8 +58,7 @@ public class PublicController {
         log.info("Public: Вызван метод getEventsFiltered");
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
-        return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
+        return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
 

@@ -37,7 +37,7 @@ public class ServiceImpl implements StatService {
     }
 
     @Override
-    public List<ViewStateDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+    public List<ViewStateDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         if (unique) {
 
           List<ViewState> uniqueStates =  statRepository.findAllByTimestampBetweenUnique(start, end, uris);

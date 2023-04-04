@@ -9,6 +9,9 @@ import ru.practicum.ViewStateDto;
 import ru.practicum.server.service.StatService;
 
 import javax.validation.Valid;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,10 +34,11 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public List<ViewStateDto> getStats(@RequestParam String start,
-                                       @RequestParam String end,
-                                       @RequestParam(required = false) List<String> uris,
-                                       @RequestParam(defaultValue = "false") boolean unique) {
-        return service.getStats(LocalDateTime.parse(start, formatter), LocalDateTime.parse(end, formatter), uris, unique);
+    public List<ViewStateDto> getStats(@RequestParam(name = "start") String start,
+                                       @RequestParam(name = "end") String end,
+                                       @RequestParam(name = "uris", required = false) List<String> uris,
+                                       @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
+        return service.getStats(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), formatter),
+                LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), formatter), uris, unique);
     }
 }

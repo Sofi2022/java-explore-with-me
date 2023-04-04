@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.StateClient;
 import ru.practicum.ViewStateDto;
 import ru.practicum.categories.dto.CategoryDto;
@@ -27,10 +29,12 @@ import ru.practicum.user.mapper.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -165,18 +169,12 @@ public class EventServiceImpl implements EventService {
             }
     }
 
-    private List<ViewStateDto> getViewsForEvents(String rangeStart, String rangeEnd, List<Event> events) {
 
-        Boolean unique = false;
-
-        List<String> uris = events.stream()
-                .map(event -> "/events/" + event.getId())
-                .collect(Collectors.toList());
-        System.out.println("URIS: " + uris);
-        List<ViewStateDto> statsDTOList = stateClient.getStats(LocalDateTime.parse(rangeStart, formatter),
-                LocalDateTime.parse(rangeEnd, formatter), uris, unique);
-        System.out.println("VIEWS: " + statsDTOList);
-        return statsDTOList;
+    public String getEventsUrl(String path, String eventId) {
+        return UriComponentsBuilder.fromHttpUrl("http://localhost:8080")
+                .pathSegment(path + eventId)
+                .build()
+                .toUriString();
     }
 
 
@@ -202,7 +200,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getEventsFiltered(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
                                                  String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
-                                                 Integer size) {
+                                                 Integer size, HttpServletRequest request) {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -248,9 +246,52 @@ public class EventServiceImpl implements EventService {
             result = eventsFromRepo.stream().filter((event -> event.getConfirmedRequests() < event.getParticipantLimit()))
                     .collect(Collectors.toList());
         }
-        List<ViewStateDto> views = getViewsForEvents(rangeStart, rangeEnd, result);
+//        for (Event event : result) {
+//            stateClient.postHit("ewm-main-service", request.getRequestURI() + "/" + event.getId(), request.getRemoteAddr(),LocalDateTime.now());
+//        } sendState
+        sendState(result, request);
+
+//        Map<String, Long> viewsMap = getViewsForEvents(start, end, result).stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
+//                        .replace("/events/", ""),
+//                ViewStateDto::getHits));
+//        result.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
+        Map<String, Long> views = getViewsForEvents(start, end, result);
+        events.forEach(event -> event.setViews(views.get(event.getId().toString())));
         return eventsMapper.toListShortDto(result);
     }
+
+    private void sendState(List<Event> events, HttpServletRequest request) {
+        for (Event event : events) {
+            stateClient.postHit("ewm-main-service", request.getRequestURI() + "/" + event.getId(), request.getRemoteAddr(),LocalDateTime.now());
+        }
+    }
+
+
+    private Map<String, Long> getViewsForEvents(LocalDateTime rangeStart, LocalDateTime rangeEnd, List<Event> events) {
+
+        if (rangeStart == null) {
+            rangeStart = LocalDateTime.now().minusYears(5);
+        }
+        if (rangeEnd == null) {
+            rangeEnd = LocalDateTime.now().minusYears(5);
+        }
+
+
+        Boolean unique = false;
+
+        List<String> uris = events.stream()
+                .map(event -> getEventsUrl("events/", event.getId().toString())
+                        .replace("http://localhost:8080", ""))
+                .collect(Collectors.toList());
+        List<ViewStateDto> views = stateClient.getStats(rangeStart, rangeEnd, uris, unique);
+        Map<String, Long> viewsMap = views.stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
+                        .replace("/events/", ""),
+                ViewStateDto::getHits));
+       // events.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
+        return viewsMap;
+    }
+
+
 
 
     @Override
