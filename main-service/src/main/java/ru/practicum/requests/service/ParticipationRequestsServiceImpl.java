@@ -44,7 +44,7 @@ public class ParticipationRequestsServiceImpl implements RequestService {
                 + eventId));
         ParticipationRequest request = new ParticipationRequest(LocalDateTime.now(), event, requester, State.PENDING);
         List<ParticipationRequest> requests = participationRequestsRepository.findAllByRequesterIdAndEventId(userId, eventId);
-        if (event.getInitiator().getId() == userId) {
+        if (event.getInitiator().getId().equals(userId)) {
             throw new RequestAlreadyExists("Инициатор события не может добавить запрос на участие в своём событии " + userId);
         }
         if (!(event.getState().equals(State.PUBLISHED))) {
