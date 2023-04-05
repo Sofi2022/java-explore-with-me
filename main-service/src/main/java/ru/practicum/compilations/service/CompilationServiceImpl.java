@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.compilations.mapper.CompilationsMapper;
-import ru.practicum.compilations.dto.CompilationDto;
-import ru.practicum.compilations.dto.NewCompilationDto;
-import ru.practicum.compilations.dto.UpdateCompilationRequest;
+import ru.practicum.compilations.CompilationDto;
+import ru.practicum.compilations.NewCompilationDto;
+import ru.practicum.compilations.UpdateCompilationRequest;
 import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationsRepository;
-import ru.practicum.events.mapper.EventsMapper;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.service.EventService;
-import ru.practicum.user.exception.NotFoundException;
+import ru.practicum.exception.NotFoundException;
 
+import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,8 +29,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     private final EventService eventService;
 
-    private final EventsMapper eventsMapper;
-
+    @Transactional
     @Override
     public CompilationDto addCompilation(NewCompilationDto compilation) {
         if (compilation.getEvents().size() != 0) {
@@ -52,7 +51,6 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto getCompilById(Long compId) {
         Compilation compilation = compilationsRepository.findById(compId).orElseThrow(() ->
                 new NotFoundException("Такой подборки нет " + compId));
-        //List<Long> events = ;
         CompilationDto compilationDto = compilationsMapper.toDto(compilation);
         return compilationDto;
     }
@@ -67,6 +65,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
 
+    @Transactional
     @Override
     public void deleteCompilation(Long compId) {
         compilationsRepository.findById(compId).orElseThrow(() ->
@@ -75,11 +74,12 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
 
+    @Transactional
     @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest compil) {
         Compilation compilationFromDb = compilationsRepository.findById(compId).orElseThrow(() ->
                 new NotFoundException("Такой подборки нет " + compId));
-        if(compil.getEvents().size() != 0) {
+        if (compil.getEvents().size() != 0) {
             Set<Long> eventIds = compil.getEvents();
             Set<Event> events = eventIds.stream().map(eventService::getEventById).collect(Collectors.toSet());
             compilationFromDb.setEvents(events);

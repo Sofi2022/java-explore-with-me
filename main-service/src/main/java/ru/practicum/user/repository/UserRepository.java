@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.user.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -19,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.id in :userIds order by u.id desc")
     Page<User> findAllByIdContainsWithPage(PageRequest pageRequest, @Param ("userIds") List<Long> userIds);
 
+    @Query("select u from User u where u.name like :name")
+    Optional<List<User>> findByName(String name);
 }

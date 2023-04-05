@@ -1,10 +1,8 @@
-package ru.practicum.compilations.dto;
+package ru.practicum.compilations;
 
 import lombok.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import java.util.List;
 import java.util.Set;
 
 @Valid
@@ -13,11 +11,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class NewCompilationDto {
+public class UpdateCompilationRequest {
 
     private Boolean pinned;
 
-    @NotBlank
     private String title;
 
     private Set<Long> events;

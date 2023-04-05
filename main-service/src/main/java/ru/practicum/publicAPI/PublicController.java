@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.StateClient;
-import ru.practicum.categories.dto.ResponseCategoryDto;
+import ru.practicum.categories.ResponseCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
-import ru.practicum.compilations.dto.CompilationDto;
+import ru.practicum.compilations.CompilationDto;
 import ru.practicum.compilations.service.CompilationService;
-import ru.practicum.events.dto.EventFullDto;
-import ru.practicum.events.dto.EventShortDto;
+import ru.practicum.events.EventFullDto;
+import ru.practicum.events.EventShortDto;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class PublicController {
     }
 
 
-    @GetMapping("events")  //ОТПРАВИТЬ ЗАПРОС В СТАТИСТИКУ!
+    @GetMapping("events")
     public List<EventShortDto> getEventsFiltered(@RequestParam(name = "text", required = false) String text,
                                                  @RequestParam(name = "categories", required = false) List<Long> categoriesIds,
                                                  @RequestParam(name = "paid", required = false) Boolean paid,
@@ -56,19 +56,17 @@ public class PublicController {
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
                                                      Integer size, HttpServletRequest request) {
         log.info("Public: Вызван метод getEventsFiltered");
-        log.info("client ip: {}", request.getRemoteAddr());
-        log.info("endpoint path: {}", request.getRequestURI());
         return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
 
-    @GetMapping("events/{id}") //ОТПРАВИТЬ ЗАПРОС В СТАТИСТИКУ!
+    @GetMapping("events/{id}")
     public EventFullDto getFullEventById(@PathVariable Long id, HttpServletRequest request) {
         log.info("Public: Вызван метод getCategoryById, id {}", id);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
         stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
-        return eventService.getFullEventById(id);
+        return eventService.getFullEventById(id, request);
     }
 
 

@@ -1,12 +1,9 @@
 package ru.practicum.requests.service;
 
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import ru.practicum.requests.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.requests.dto.EventRequestStatusUpdateResult;
-import ru.practicum.requests.dto.ParticipationRequestDto;
+import ru.practicum.requests.EventRequestStatusUpdateRequest;
+import ru.practicum.requests.EventRequestStatusUpdateResult;
+import ru.practicum.requests.ParticipationRequestDto;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public interface RequestService {

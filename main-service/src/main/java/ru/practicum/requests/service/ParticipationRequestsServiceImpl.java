@@ -2,17 +2,18 @@ package ru.practicum.requests.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
-import ru.practicum.requests.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.requests.dto.EventRequestStatusUpdateResult;
-import ru.practicum.requests.dto.ParticipationRequestDto;
+import ru.practicum.requests.EventRequestStatusUpdateRequest;
+import ru.practicum.requests.EventRequestStatusUpdateResult;
+import ru.practicum.requests.ParticipationRequestDto;
 import ru.practicum.requests.mapper.ParticipationRequestsMapper;
 import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.requests.repository.ParticipationRequestsRepository;
 import ru.practicum.state.State;
-import ru.practicum.user.exception.NotFoundException;
-import ru.practicum.user.exception.RequestAlreadyExists;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RequestAlreadyExists;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
@@ -33,11 +34,13 @@ public class ParticipationRequestsServiceImpl implements RequestService {
 
     private final ParticipationRequestsMapper partMapper;
 
+
+    @Transactional
     @Override
     public ParticipationRequestDto addRequest(Long userId, Long eventId) {
-        User requester = userRepository.findById(userId).orElseThrow(() -> new NotFoundException( "Такого пользователя нет "
+        User requester = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет "
         + userId));
-        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException( "Такого события нет "
+        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого события нет "
                 + eventId));
         ParticipationRequest request = new ParticipationRequest(LocalDateTime.now(), event, requester, State.PENDING);
         List<ParticipationRequest> requests = participationRequestsRepository.findAllByRequesterIdAndEventId(userId, eventId);
@@ -55,14 +58,13 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         }
 
         if (requests.isEmpty()) {
-            if(!event.getRequestModeration()) {
+            if (!event.getRequestModeration()) {
                 request.setState(State.CONFIRMED);
+                event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             } else {
                 request.setState(State.PENDING);
             }
             ParticipationRequest savedRequest = participationRequestsRepository.save(request);
-            //Меняем кол-во подтвержденных заявок у события
-            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
             return partMapper.toDto(savedRequest);
         } else {
             throw new RequestAlreadyExists("Нельзя добавить повторный запрос: userId {}, eventId {} " + userId + eventId);
@@ -87,21 +89,23 @@ public class ParticipationRequestsServiceImpl implements RequestService {
     }
 
 
+    @Transactional
     @Override
     public ParticipationRequestDto cancelRequestByUser(Long userId, Long requestId) {
         validateUser(userId);
         ParticipationRequest request = participationRequestsRepository.findById(requestId).orElseThrow(() ->
-                new NotFoundException( "Такой заявки нет " + requestId));
+                new NotFoundException("Такой заявки нет " + requestId));
         request.setState(State.CANCELED);
         return partMapper.toDto(participationRequestsRepository.save(request));
     }
 
 
+    @Transactional
     @Override
     public EventRequestStatusUpdateResult confirmOrRejectRequestsByUser(Long userId, Long eventId,
                                                                         EventRequestStatusUpdateRequest request) {
         validateUser(userId);
-        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException( "Такого события нет "
+        Event event = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого события нет "
                 + eventId));
         if (event.getParticipantLimit() == 0 && !event.getRequestModeration()) {
             throw new RequestAlreadyExists("Подтверждение заявки не требуется " + eventId);
@@ -111,22 +115,21 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         }
 
         List<Long> requestIds = request.getRequestIds();
-        State state = State.valueOf(request.getStatus());
+
+        String status = request.getStatus();
 
         List<ParticipationRequest> requests = requestIds.stream().map((id) -> participationRequestsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException( "Такой заявки нет "
+                .orElseThrow(() -> new NotFoundException("Такой заявки нет "
                 + id))).collect(Collectors.toList());
 
         List<ParticipationRequest> confirmedRequests = new ArrayList<>();
         List<ParticipationRequest> rejectedRequests = new ArrayList<>();
 
 
-
-
-        for(ParticipationRequest req : requests) {
-                if (state.equals(State.CONFIRMED) && req.getState().equals(State.PENDING)) {
+        for (ParticipationRequest req : requests) {
+                if (status.equals("CONFIRMED") && req.getState().equals(State.PENDING)) {
                     if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-                        req.setState(State.CANCELED);
+                        req.setState(State.REJECTED);
                         participationRequestsRepository.save(req);
                         rejectedRequests.add(req);
                     }
@@ -136,12 +139,10 @@ public class ParticipationRequestsServiceImpl implements RequestService {
                     eventsRepository.save(event);
                     confirmedRequests.add(req);
                 }
-                if(state.equals(State.CANCELED) && req.getState().equals(State.PENDING)) {
-                    req.setState(State.CANCELED);
+                if (status.equals("REJECTED") && req.getState().equals(State.PENDING)) {
+                    req.setState(State.REJECTED);
                     participationRequestsRepository.save(req);
                     rejectedRequests.add(req);
-                    //event.setConfirmedRequests(event.getConfirmedRequests() - 1);
-                    //eventsRepository.save(event);
                 }
             }
 
@@ -152,14 +153,13 @@ public class ParticipationRequestsServiceImpl implements RequestService {
     }
 
     private void validateUser(Long userId) {
-        userRepository.findById(userId).orElseThrow(() -> new NotFoundException( "Такого пользователя нет "
+        userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет "
                 + userId));
     }
 
 
     private void validateEvent(Long eventId) {
-        eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException( "Такого события нет "
+        eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException("Такого события нет "
                 + eventId));
     }
-
 }

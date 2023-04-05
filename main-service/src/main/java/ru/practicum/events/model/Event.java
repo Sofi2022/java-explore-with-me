@@ -1,13 +1,10 @@
 package ru.practicum.events.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Timestamp;
 import lombok.*;
-import ru.practicum.compilations.model.Compilation;
-import ru.practicum.locations.model.Location;
 import ru.practicum.categories.model.Category;
+import ru.practicum.locations.model.Location;
 import ru.practicum.state.State;
 import ru.practicum.user.model.User;
 

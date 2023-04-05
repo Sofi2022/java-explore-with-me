@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @AllArgsConstructor
-//@RequiredArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
@@ -30,11 +29,11 @@ public class ParticipationRequest {
     private LocalDateTime created;
 
     @ManyToOne
-    @JoinColumn(name= "event_id")
+    @JoinColumn(name = "event_id")
     private Event event;
 
     @ManyToOne
-    @JoinColumn(name= "requester_id")
+    @JoinColumn(name = "requester_id")
     private User requester;
 
     @Column(name = "state")

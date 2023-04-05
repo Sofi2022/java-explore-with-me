@@ -4,15 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.EndpointHitDto;
-import ru.practicum.ViewStateDto;
+import ru.practicum.stat.EndpointHitDto;
+import ru.practicum.stat.ViewStateDto;
 import ru.practicum.server.service.StatService;
 
 import javax.validation.Valid;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

@@ -4,21 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.categories.dto.CategoryDto;
-import ru.practicum.categories.dto.ResponseCategoryDto;
-import ru.practicum.categories.dto.NewCategoryDto;
+import ru.practicum.categories.CategoryDto;
+import ru.practicum.categories.ResponseCategoryDto;
+import ru.practicum.categories.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
-import ru.practicum.compilations.dto.CompilationDto;
-import ru.practicum.compilations.dto.NewCompilationDto;
-import ru.practicum.compilations.dto.UpdateCompilationRequest;
+import ru.practicum.compilations.CompilationDto;
+import ru.practicum.compilations.NewCompilationDto;
+import ru.practicum.compilations.UpdateCompilationRequest;
 import ru.practicum.compilations.service.CompilationService;
-import ru.practicum.events.dto.EventFullDto;
-import ru.practicum.events.dto.UpdateEventAdminRequest;
+import ru.practicum.events.EventFullDto;
+import ru.practicum.events.UpdateEventAdminRequest;
 import ru.practicum.events.service.EventService;
 import ru.practicum.user.NewUserRequestDto;
 import ru.practicum.user.UserDto;
 import ru.practicum.user.service.UserService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -90,13 +91,15 @@ public class AdminController {
     }
 
     @GetMapping("/events")
-    public List<EventFullDto> searchEvents(@RequestParam(name = "users") List<Long> userIds, @RequestParam(name = "states")
-    List<String> states, @RequestParam(name = "categories") List<Long> categories, @RequestParam(name = "rangeStart")
-                                           String rangeStart, @RequestParam(name = "rangeEnd")
+    public List<EventFullDto> searchEvents(@RequestParam(name = "users", required = false) List<Long> userIds,
+                                           @RequestParam(name = "states", required = false)
+    List<String> states, @RequestParam(name = "categories", required = false) List<Long> categories,
+                                           @RequestParam(name = "rangeStart", required = false)
+                                           String rangeStart, @RequestParam(name = "rangeEnd", required = false)
     String rangeEnd, @RequestParam(name = "from",
-            defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
+            defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
         log.info("Admin: Вызван метод searchEvents ");
-        return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size);
+        return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size, request);
     }
 
 

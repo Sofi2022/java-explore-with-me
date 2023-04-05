@@ -1,10 +1,9 @@
-package ru.practicum.compilations.dto;
+package ru.practicum.compilations;
 
 import lombok.*;
-import ru.practicum.events.model.Event;
+import ru.practicum.events.EventShortDto;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Set;
 
 @Valid
@@ -21,5 +20,5 @@ public class CompilationDto {
 
     private String title;
 
-    private Set<Event> events;
+    private Set<EventShortDto> events;
 }

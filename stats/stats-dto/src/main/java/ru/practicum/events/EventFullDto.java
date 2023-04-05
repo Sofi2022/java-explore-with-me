@@ -1,10 +1,10 @@
-package ru.practicum.events.dto;
+package ru.practicum.events;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jdk.jfr.Timestamp;
 import lombok.*;
-import ru.practicum.categories.dto.CategoryDto;
-import ru.practicum.locations.dto.LocationDto;
+import ru.practicum.categories.CategoryDto;
+import ru.practicum.locations.LocationDto;
 import ru.practicum.state.State;
 import ru.practicum.user.UserShortDto;
 
@@ -25,7 +25,7 @@ public class EventFullDto {
 
     private CategoryDto category;
 
-    private Long confirmedRequests; //кол-во одобренных заявок
+    private Long confirmedRequests;
 
     @Timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

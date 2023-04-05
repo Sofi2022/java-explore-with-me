@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.stat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;

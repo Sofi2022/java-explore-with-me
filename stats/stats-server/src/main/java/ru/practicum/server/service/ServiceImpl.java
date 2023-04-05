@@ -2,8 +2,8 @@ package ru.practicum.server.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
-import ru.practicum.EndpointHitDto;
-import ru.practicum.ViewStateDto;
+import ru.practicum.stat.EndpointHitDto;
+import ru.practicum.stat.ViewStateDto;
 import ru.practicum.server.mapper.StatMapper;
 import ru.practicum.server.mapper.ViewStateMapper;
 import ru.practicum.server.model.EndpointHit;

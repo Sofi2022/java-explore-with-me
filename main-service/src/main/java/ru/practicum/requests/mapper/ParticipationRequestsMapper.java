@@ -2,8 +2,8 @@ package ru.practicum.requests.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.practicum.requests.dto.EventRequestStatusUpdateResult;
-import ru.practicum.requests.dto.ParticipationRequestDto;
+import ru.practicum.requests.EventRequestStatusUpdateResult;
+import ru.practicum.requests.ParticipationRequestDto;
 import ru.practicum.requests.model.ParticipationRequest;
 
 import java.util.List;

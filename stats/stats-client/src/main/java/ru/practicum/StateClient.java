@@ -1,21 +1,16 @@
 package ru.practicum;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import ru.practicum.user.NewUserRequestDto;
-import ru.practicum.user.UserDto;
+import ru.practicum.stat.EndpointHitDto;
+import ru.practicum.stat.ViewStateDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class StateClient {
@@ -27,6 +22,7 @@ public class StateClient {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
     private static final String STAT_SERVER_URL = "http://localhost:9090";
+
     public StateClient(WebClient.Builder webClientBuilder, @Value(STAT_SERVER_URL) String baseUrl) {
         this.baseUrl = baseUrl;
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
@@ -63,21 +59,10 @@ public class StateClient {
                         .queryParam("uris", uris.toArray(new String[0]))
                         .queryParam("unique", unique)
                         .build()
-                        //.encode()
                         .toUriString())
                 .retrieve()
                 .bodyToFlux(ViewStateDto.class)
                 .collectList()
                 .block();
     }
-                        //.toUriString()
-
-//                        uriBuilder -> uriBuilder
-//                        .path("/stats")
-//                        .queryParam("start", String.valueOf(start))
-//                        .queryParam("end", String.valueOf(end))
-//                        .queryParam(String.valueOf(unique))
-//                        .queryParam("uris", String.join(",", uris))
-//                        .build())
-    //}
 }

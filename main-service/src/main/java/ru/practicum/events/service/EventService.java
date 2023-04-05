@@ -1,6 +1,6 @@
 package ru.practicum.events.service;
 
-import ru.practicum.events.dto.*;
+import ru.practicum.events.*;
 import ru.practicum.events.model.Event;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +13,8 @@ public interface EventService {
     EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest event);
 
     List<EventFullDto> searchEvents(List<Long> userIds, List<String> states, List<Long> categories, String rangeStart,
-                                    String rangeEnd, Integer from, Integer size);
+                                    String rangeEnd, Integer from, Integer size, HttpServletRequest request);
+
     EventFullDto getEventByUser(Long userId, Long eventId);
 
     List<EventShortDto> getEventsByUserWithPage(Long userId, Integer from, Integer size);
@@ -22,7 +23,7 @@ public interface EventService {
                                           String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size,
                                           HttpServletRequest request);
 
-    EventFullDto getFullEventById(Long eventId);
+    EventFullDto getFullEventById(Long eventId, HttpServletRequest request);
 
     EventFullDto updateEventByUser(Long userId, Long eventId, UpdateEventUserRequest event);
 

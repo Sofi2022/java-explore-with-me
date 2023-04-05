@@ -65,4 +65,11 @@ public interface EventsRepository extends JpaRepository<Event, Long> {
     Page<Event> findAllEventsFilteredWithPageWithoutCategoryViewsAsc(PageRequest pageRequest, @Param("text") String text,
                                                                          @Param("start") LocalDateTime start,
                                                                      @Param("end") LocalDateTime end);
+
+    @Query("select e from Event e join e.category where e.category.id in :categoriesIds")
+    Page<Event> findAllByIds(PageRequest pageRequest, List<Long> categoriesIds);
+
+
+    @Query("select e from Event e join e.category where e.category.id = :catId")
+    Optional<List<Event>> findAllByCategoryId(Long catId);
 }

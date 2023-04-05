@@ -1,8 +1,8 @@
-package ru.practicum.events.dto;
+package ru.practicum.events;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import ru.practicum.categories.dto.CategoryDto;
+import ru.practicum.categories.CategoryDto;
 import ru.practicum.user.UserShortDto;
 
 import javax.validation.Valid;

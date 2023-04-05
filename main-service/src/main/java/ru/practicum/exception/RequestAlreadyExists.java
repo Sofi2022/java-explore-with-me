@@ -1,4 +1,4 @@
-package ru.practicum.user.exception;
+package ru.practicum.exception;
 
 public class RequestAlreadyExists extends RuntimeException {
 
