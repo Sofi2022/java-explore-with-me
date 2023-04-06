@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StateClient;
 import ru.practicum.events.*;
-import ru.practicum.stat.EndpointHitDto;
 import ru.practicum.stat.ViewStateDto;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
@@ -175,7 +174,8 @@ public class EventServiceImpl implements EventService {
         List<Event> events;
         if (eventsWithPage != null) {
             events = eventsWithPage.getContent();
-            sendState(events, request);
+            stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+
 
             Set<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toSet());
             Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
@@ -267,7 +267,7 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
 
-        sendState(result, request);
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         Set<Long> eventIds = result.stream().map(Event::getId).collect(Collectors.toSet());
         Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
@@ -292,13 +292,13 @@ public class EventServiceImpl implements EventService {
                 //return eventsMapper.toListShortDto(result);
     }
 
-    private void sendState(List<Event> events, HttpServletRequest request) {
-        EndpointHitDto endpointHitDto = new EndpointHitDto("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+   // private void sendState(List<Event> events, HttpServletRequest request) {
+        //EndpointHitDto endpointHitDto = new EndpointHitDto("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
 //        for (Event event : events) {
-            stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+            //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 //        }
-    }
+   // }
 
 
     private LocalDateTime validateStartTime(LocalDateTime rangeStart) {
