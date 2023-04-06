@@ -21,7 +21,7 @@ services:
       - POSTGRES_PASSWORD=diplom
 
   main-service:
-    build: ./main-service
+    build: main-service
     container_name: main-service
     ports:
       - "8080:8080"

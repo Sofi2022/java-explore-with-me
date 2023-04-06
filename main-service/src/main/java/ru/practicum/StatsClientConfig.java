@@ -1,4 +1,4 @@
-package ru.practicum.config;
+package ru.practicum;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
