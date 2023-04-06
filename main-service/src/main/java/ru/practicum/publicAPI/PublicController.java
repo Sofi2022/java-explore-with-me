@@ -28,7 +28,7 @@ public class PublicController {
 
     private final CompilationService compilService;
 
-    private StateClient stateClient;
+    private final StateClient stateClient;
 
     @GetMapping("/categories")
     public List<ResponseCategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
