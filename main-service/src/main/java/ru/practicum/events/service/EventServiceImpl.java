@@ -160,34 +160,14 @@ public class EventServiceImpl implements EventService {
             end = LocalDateTime.now().plusYears(5);
         }
 
-        Page<Event> eventsWithPage = null;
-
         if (userIds.size() != 0 && states.size() != 0 && categories.size() != 0) {
-            eventsWithPage = eventsRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
+            Page<Event> eventsWithPage = eventsRepository.findAllWithAllParameters(userIds, stateList, categories, start, end,
                     pageRequest);
             return eventsMapper.toListFullDto(eventsWithPage.getContent());
         }
         if (userIds.size() == 0 && categories.size() != 0) {
-            eventsWithPage = eventsRepository.findAllEventsWithoutIdList(categories, stateList, start, end, pageRequest);
+            Page<Event> eventsWithPage = eventsRepository.findAllEventsWithoutIdList(categories, stateList, start, end, pageRequest);
             return eventsMapper.toListFullDto(eventsWithPage.getContent());
-        }
-
-
-        List<Event> events;
-        if (eventsWithPage != null) {
-            events = eventsWithPage.getContent();
-            //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-
-
-            Set<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toSet());
-            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
-
-            List<EventFullDto> eventsFull = eventsMapper.toListFullDto(events);
-
-            eventsFull.forEach(eventFullDto ->
-                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
-            return eventsFull;
-            //return eventsMapper.toListFullDto(events);
         } else {
             return new ArrayList<>();
         }

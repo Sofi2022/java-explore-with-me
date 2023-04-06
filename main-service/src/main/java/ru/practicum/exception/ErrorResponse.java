@@ -1,21 +1,15 @@
 package ru.practicum.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
 import java.util.Date;
 
-@Getter
-@RequiredArgsConstructor
 @AllArgsConstructor
-public class ErrorResponse {
-
-    private Date date;
-
-    private int value;
-
-    private String reasonPhrase;
-
-    private String message;
+@Value
+class ErrorResponse {
+    Date timestamp;
+    int status;
+    String error;
+    String path;
 }

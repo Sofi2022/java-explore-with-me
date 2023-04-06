@@ -56,8 +56,10 @@ public class PublicController {
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
                                                      Integer size, HttpServletRequest request) {
         log.info("Public: Вызван метод getEventsFiltered");
+        List<EventShortDto> result =  eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
         stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-        return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
+        return result;
+
     }
 
 
@@ -66,9 +68,9 @@ public class PublicController {
         log.info("Public: Вызван метод getCategoryById, id {}", id);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
+        EventFullDto event = eventService.getFullEventById(id, request);
         stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-        return eventService.getFullEventById(id, request);
+        return event;
     }
 
 
