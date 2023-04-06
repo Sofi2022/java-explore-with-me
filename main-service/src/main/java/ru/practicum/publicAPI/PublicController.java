@@ -13,7 +13,6 @@ import ru.practicum.events.EventShortDto;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -65,7 +64,7 @@ public class PublicController {
         log.info("Public: Вызван метод getCategoryById, id {}", id);
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
-        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
+        //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
         return eventService.getFullEventById(id, request);
     }
 

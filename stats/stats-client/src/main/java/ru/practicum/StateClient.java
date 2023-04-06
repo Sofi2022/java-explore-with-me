@@ -1,67 +1,90 @@
 package ru.practicum;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Mono;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.stat.EndpointHitDto;
 import ru.practicum.stat.ViewStateDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class StateClient {
+public class StateClient extends BaseClient {
 
-    protected final WebClient webClient;
-    private final String baseUrl;
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final TypeReference<List<ViewStateDto>> mapType = new TypeReference<>() {};
 
-    public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
-
-
-    public StateClient(@Value("${stats-server.url}") String baseUrl, WebClient.Builder webClientBuilder) {
-        this.baseUrl = baseUrl;
-        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
+    @Autowired
+    public StateClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+        super(
+                builder
+                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+                        .requestFactory(HttpComponentsClientHttpRequestFactory::new)
+                        .build()
+        );
     }
 
-    public void postHit(String app,
+    public ResponseEntity<Object> postHit(String app,
                         String uri,
                         String ip,
                         LocalDateTime timestamp) {
-        EndpointHitDto endpointHitDTO = EndpointHitDto.builder()
-                .app(app)
-                .uri(uri)
-                .ip(ip)
-                .timestamp(timestamp)
-                .build();
-
-        webClient.post()
-                .uri("/hit")
-                .body(Mono.just(endpointHitDTO), EndpointHitDto.class)
-                .retrieve()
-                .bodyToMono(EndpointHitDto.class)
-                .block();
+        EndpointHitDto endpointHitDto = new EndpointHitDto(app, uri, ip, timestamp);
+        return post("/hit", endpointHitDto);
     }
 
-    public List<ViewStateDto> getStats(LocalDateTime start,
-                                       LocalDateTime end,
-                                       List<String> uris,
-                                       Boolean unique) {
-        return this.webClient.get()
-                .uri(UriComponentsBuilder.fromHttpUrl("http://localhost:9090")
-                        .pathSegment("/stats")
-                        .queryParam("start",  start.format(formatter))
-                        .queryParam("end", end.format(formatter))
-                        .queryParam("uris", String.join(",", uris))
-                        .queryParam("unique", unique)
-                        .build()
-                        .toUriString())
-                .retrieve()
-                .bodyToFlux(ViewStateDto.class)
-                .collectList()
-                .block();
+    public ResponseEntity<Object> getStats(String start, String end, String uris, Boolean unique) {
+        Map<String, Object> parameters = Map.of(
+                "start", start,
+                "end", end,
+                "uris", uris,
+                "unique", unique
+        );
+        return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+    }
+
+    public Long getViewsByEventId(Long eventId) {
+        Map<String, Object> parameters = Map.of(
+                "start", LocalDateTime.now().minusYears(1000).format(dateTimeFormatter),
+                "end", LocalDateTime.now().plusYears(1000).format(dateTimeFormatter),
+                "uris", toString(List.of("/events/" + eventId)),
+                "unique", Boolean.FALSE
+        );
+        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+
+        List<ViewStateDto> viewStatsList = response.hasBody() ? mapper.convertValue(response.getBody(), mapType) : Collections.emptyList();
+        return viewStatsList != null && !viewStatsList.isEmpty() ? viewStatsList.get(0).getHits() : 0L;
+    }
+
+    public Map<Long, Long> getSetViewsByEventId(Set<Long> eventIds) {
+        Map<String, Object> parameters = Map.of(
+                "start", LocalDateTime.now().minusYears(1000).format(dateTimeFormatter),
+                "end", LocalDateTime.now().plusYears(1000).format(dateTimeFormatter),
+                "uris", (eventIds.stream().map(id -> "/events/" + id).collect(Collectors.toList())),
+                "unique", Boolean.FALSE
+        );
+        ResponseEntity<Object> response = get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+
+        return response.hasBody() ? mapper.convertValue(response.getBody(), mapType).stream()
+                .collect(Collectors.toMap(
+                        this::getEventIdFromURI, ViewStateDto::getHits))
+                : Collections.emptyMap();
+    }
+
+    private Long getEventIdFromURI(ViewStateDto e) {
+        return Long.parseLong(e.getUri().substring(e.getUri().lastIndexOf("/") + 1));
+    }
+
+    private String toString(List<String> strings) {
+        return Arrays.toString(strings.toArray()).replace("[", "").replace("]", "");
     }
 }

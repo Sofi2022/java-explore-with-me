@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StateClient;
 import ru.practicum.events.*;
+import ru.practicum.stat.EndpointHitDto;
 import ru.practicum.stat.ViewStateDto;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
@@ -175,12 +176,15 @@ public class EventServiceImpl implements EventService {
         if (eventsWithPage != null) {
             events = eventsWithPage.getContent();
             sendState(events, request);
-            List<ViewStateDto> views = getViewsForAdminEvents(start, end, events);
-            Map<String, Long> viewsMap = views.stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
-                            .replace("/admin/events/", ""),
-                    ViewStateDto::getHits));
-            events.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
-            return eventsMapper.toListFullDto(events);
+
+            Set<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toSet());
+            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+            List<EventFullDto> eventsFull = eventsMapper.toListFullDto(events);
+
+            eventsFull.forEach(eventFullDto ->
+                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+            return eventsFull;
         } else {
             return new ArrayList<>();
         }
@@ -265,21 +269,35 @@ public class EventServiceImpl implements EventService {
 
         sendState(result, request);
 
-        List<ViewStateDto> views = getViewsForPublicEvents(start, end, result);
-        System.out.println("VIEWS: " + views);
-        Map<String, Long> viewsMap = views.stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
-                        .replace("/events/", ""),
-                ViewStateDto::getHits));
-        events.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
-                List<EventShortDto> res = eventsMapper.toListShortDto(result);
-        System.out.println("RESULT: " + res);
-                return res;
+        Set<Long> eventIds = result.stream().map(Event::getId).collect(Collectors.toSet());
+        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+        List<EventShortDto> eventShort = eventsMapper.toListShortDto(result);
+
+        eventShort.forEach(eventFullDto ->
+                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+
+        return eventShort;
+
+//        System.out.println("ZAPROS OTPRAVLEN");
+//
+//        List<ViewStateDto> views = getViewsForPublicEvents(start, end, result);
+//
+//        Map<String, Long> viewsMap = views.stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
+//                        .replace("/events/", ""),
+//                ViewStateDto::getHits));
+//
+//        System.out.println("VIEWS: " + views);
+//        events.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
+                //return eventsMapper.toListShortDto(result);
     }
 
     private void sendState(List<Event> events, HttpServletRequest request) {
-        for (Event event : events) {
-            stateClient.postHit("ewm-main-service", request.getRequestURI() + "/" + event.getId(), request.getRemoteAddr(), LocalDateTime.now());
-        }
+        EndpointHitDto endpointHitDto = new EndpointHitDto("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+
+//        for (Event event : events) {
+            stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+//        }
     }
 
 
@@ -304,11 +322,11 @@ public class EventServiceImpl implements EventService {
 
         Boolean unique = false;
 
-        List<String> uris = events.stream().map(event -> "/events/" + event.getId())
-                .collect(Collectors.toList());
-        List<ViewStateDto> views = stateClient.getStats(start, end, uris, unique);
+//        List<String> uris = events.stream().map(event -> "/events/" + event.getId())
+//                .collect(Collectors.toList());
+        //List<ViewStateDto> views = stateClient.getStats(start.toString(), end.toString(), uris, unique);
 
-        return views;
+        return null;
     }
 
 
@@ -320,9 +338,9 @@ public class EventServiceImpl implements EventService {
 
         List<String> uris = events.stream().map(event -> "/admin/events/" + event.getId())
                 .collect(Collectors.toList());
-        List<ViewStateDto> views = stateClient.getStats(start, end, uris, unique);
+        //List<ViewStateDto> views = stateClient.getStats(start, end, uris, unique);
 
-        return views;
+        return null;
     }
 
 
@@ -333,9 +351,9 @@ public class EventServiceImpl implements EventService {
         if (event.isEmpty()) {
             throw new NotFoundException("Такого события нет " + eventId);
         } else {
-            List<ViewStateDto> views = getViewsForPublicEvents(null, null, List.of(event.get()));
+            Long views = stateClient.getViewsByEventId(eventId);
             EventFullDto result = eventsMapper.toDto(event.get());
-            result.setViews(views.get(0).getHits());
+            result.setViews(views);
             return result;
         }
     }
