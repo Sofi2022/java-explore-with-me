@@ -20,8 +20,8 @@ services:
       - POSTGRES_USER=diplom
       - POSTGRES_PASSWORD=diplom
 
-  ewm-service:
-    build: main-service
+  main-service:
+    build: ./main-service
     container_name: main-service
     ports:
       - "8080:8080"

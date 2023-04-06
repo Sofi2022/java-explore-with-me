@@ -21,9 +21,8 @@ public class StateClient {
     public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
-    private static final String STAT_SERVER_URL = "http://localhost:9090";
 
-    public StateClient(WebClient.Builder webClientBuilder, @Value(STAT_SERVER_URL) String baseUrl) {
+    public StateClient(@Value("${stats-server.url}") String baseUrl, WebClient.Builder webClientBuilder) {
         this.baseUrl = baseUrl;
         this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
@@ -53,10 +52,10 @@ public class StateClient {
                                        Boolean unique) {
         return this.webClient.get()
                 .uri(UriComponentsBuilder.fromHttpUrl("http://localhost:9090")
-                        .pathSegment("stats")
+                        .pathSegment("/stats")
                         .queryParam("start",  start.format(formatter))
                         .queryParam("end", end.format(formatter))
-                        .queryParam("uris", uris.toArray(new String[0]))
+                        .queryParam("uris", String.join(",", uris))
                         .queryParam("unique", unique)
                         .build()
                         .toUriString())

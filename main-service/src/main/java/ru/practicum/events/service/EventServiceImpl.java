@@ -1,6 +1,7 @@
 package ru.practicum.events.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
@@ -209,6 +211,7 @@ public class EventServiceImpl implements EventService {
                                                  String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
                                                  Integer size, HttpServletRequest request) {
 
+        log.info("PARAMS: " + text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -263,11 +266,14 @@ public class EventServiceImpl implements EventService {
         sendState(result, request);
 
         List<ViewStateDto> views = getViewsForPublicEvents(start, end, result);
+        System.out.println("VIEWS: " + views);
         Map<String, Long> viewsMap = views.stream().collect(Collectors.toMap(stateDto -> stateDto.getUri()
                         .replace("/events/", ""),
                 ViewStateDto::getHits));
         events.forEach(event -> event.setViews(viewsMap.get(event.getId().toString())));
-        return eventsMapper.toListShortDto(result);
+                List<EventShortDto> res = eventsMapper.toListShortDto(result);
+        System.out.println("RESULT: " + res);
+                return res;
     }
 
     private void sendState(List<Event> events, HttpServletRequest request) {
