@@ -20,7 +20,7 @@ services:
       - POSTGRES_USER=diplom
       - POSTGRES_PASSWORD=diplom
 
-  main-service:
+  ewm-service:
     build: main-service
     container_name: main-service
     ports:
