@@ -7,59 +7,51 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
 public class ErrorHandler {
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(
-                new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                e.getMessage()
-        );
+    public Map<String, String> handleNotFoundException(NotFoundException exception) {
+        Map<String, String> result = Map.of("Not Found Error", exception.getMessage());
+        log.warn(String.valueOf(result), exception, exception.getMessage());
+        return result;
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowableException(final Throwable e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(
-                new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                e.getMessage()
-        );
-    }
-
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDataException(final DataIntegrityViolationException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(
-                new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
-                e.getMessage()
-        );
+    public Map<String, String> handleAlreadyExistsException(RequestAlreadyExists exception) {
+        Map<String, String> result = Map.of("Нельзя добавить повторный запрос", exception.getMessage());
+        log.warn(String.valueOf(result), exception, exception.getMessage());
+        return result;
     }
 
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(final RequestAlreadyExists e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleAlreadyExistException(final DataIntegrityViolationException e) {
         log.error(e.getMessage());
         return new ErrorResponse(
                 new Date(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT.getReasonPhrase(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleConstraintExistxception(final ConstraintViolationException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(
+                new Date(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
                 e.getMessage()
         );
     }

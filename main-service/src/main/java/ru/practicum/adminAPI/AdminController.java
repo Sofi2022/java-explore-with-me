@@ -81,7 +81,7 @@ public class AdminController {
 
 
     @PatchMapping("/categories/{catId}")
-    public ResponseCategoryDto updateCategory(@Valid @RequestBody CategoryDto category, @PathVariable Long catId) {
+    public ResponseCategoryDto updateCategory(@RequestBody CategoryDto category, @PathVariable Long catId) {
         log.info("Admin: Вызван метод updateCategory " + catId);
         return categoriesService.update(category, catId);
     }
