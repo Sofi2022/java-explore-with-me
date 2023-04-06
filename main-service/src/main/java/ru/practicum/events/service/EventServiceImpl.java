@@ -176,18 +176,18 @@ public class EventServiceImpl implements EventService {
         List<Event> events;
         if (eventsWithPage != null) {
             events = eventsWithPage.getContent();
-//            stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-//
-//
-//            Set<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toSet());
-//            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
-//
-//            List<EventFullDto> eventsFull = eventsMapper.toListFullDto(events);
-//
-//            eventsFull.forEach(eventFullDto ->
-//                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
-//            return eventsFull;
-            return eventsMapper.toListFullDto(events);
+            //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
+
+
+            Set<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toSet());
+            Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
+
+            List<EventFullDto> eventsFull = eventsMapper.toListFullDto(events);
+
+            eventsFull.forEach(eventFullDto ->
+                    eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+            return eventsFull;
+            //return eventsMapper.toListFullDto(events);
         } else {
             return new ArrayList<>();
         }
@@ -270,19 +270,19 @@ public class EventServiceImpl implements EventService {
                     .collect(Collectors.toList());
         }
 
-//        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-//
-//        Set<Long> eventIds = result.stream().map(Event::getId).collect(Collectors.toSet());
-//        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
-//
-//        List<EventShortDto> eventShort = eventsMapper.toListShortDto(result);
-//
-//        eventShort.forEach(eventFullDto ->
-//                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+        //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
-        //return eventShort;
+        Set<Long> eventIds = result.stream().map(Event::getId).collect(Collectors.toSet());
+        Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
 
-        return eventsMapper.toListShortDto(result);
+        List<EventShortDto> eventShort = eventsMapper.toListShortDto(result);
+
+        eventShort.forEach(eventFullDto ->
+                eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
+
+        return eventShort;
+
+        //return eventsMapper.toListShortDto(result);
     }
 
 
@@ -331,16 +331,15 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventFullDto getFullEventById(Long eventId, HttpServletRequest request) {
-        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         Optional<Event> event = eventsRepository.findEventByIdAndStatePublished(eventId);
         if (event.isEmpty()) {
             throw new NotFoundException("Такого события нет " + eventId);
         } else {
-            //Long views = stateClient.getViewsByEventId(eventId);
-            //EventFullDto result = eventsMapper.toDto(event.get());
-            //result.setViews(views);
-            //return result;
-            return eventsMapper.toDto(event.get());
+            Long views = stateClient.getViewsByEventId(eventId);
+            EventFullDto result = eventsMapper.toDto(event.get());
+            result.setViews(views);
+            return result;
+            //return eventsMapper.toDto(event.get());
         }
     }
 

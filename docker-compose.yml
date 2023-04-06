@@ -29,7 +29,8 @@ services:
       - ewm-db
       - stats-server
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/postgres
+      - STATSSERVER_URL=http://stats-server:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/postgres-db
       - SPRING.DATASOURCE.USERNAME=main
       - SPRING.DATASOURCE.PASSWORD=main
 

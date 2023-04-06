@@ -13,6 +13,7 @@ import ru.practicum.events.EventShortDto;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class PublicController {
 
     private final CompilationService compilService;
 
-    private final StateClient stateClient;
+    private StateClient stateClient;
 
     @GetMapping("/categories")
     public List<ResponseCategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") Integer from,
@@ -55,6 +56,7 @@ public class PublicController {
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
                                                      Integer size, HttpServletRequest request) {
         log.info("Public: Вызван метод getEventsFiltered");
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         return eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
     }
 
@@ -65,6 +67,7 @@ public class PublicController {
         log.info("client ip: {}", request.getRemoteAddr());
         log.info("endpoint path: {}", request.getRequestURI());
         //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(),LocalDateTime.now());
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         return eventService.getFullEventById(id, request);
     }
 

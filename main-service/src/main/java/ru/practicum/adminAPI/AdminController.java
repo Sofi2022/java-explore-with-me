@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.StateClient;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.ResponseCategoryDto;
 import ru.practicum.categories.NewCategoryDto;
@@ -21,6 +22,7 @@ import ru.practicum.user.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -36,6 +38,8 @@ public class AdminController {
     private final EventService eventService;
 
     private final CompilationService compilService;
+
+    private StateClient stateClient;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -99,6 +103,7 @@ public class AdminController {
     String rangeEnd, @RequestParam(name = "from",
             defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
         log.info("Admin: Вызван метод searchEvents ");
+        stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size, request);
     }
 

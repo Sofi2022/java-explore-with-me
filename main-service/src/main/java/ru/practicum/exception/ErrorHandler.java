@@ -18,7 +18,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFoundException(NotFoundException exception) {
         Map<String, String> result = Map.of("Not Found Error", exception.getMessage());
-        log.warn(String.valueOf(result), exception);
+        log.warn(String.valueOf(result), exception, exception.getMessage());
         return result;
     }
 
@@ -26,7 +26,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleAlreadyExistsException(RequestAlreadyExists exception) {
         Map<String, String> result = Map.of("Нельзя добавить повторный запрос", exception.getMessage());
-        log.warn(String.valueOf(result), exception);
+        log.warn(String.valueOf(result), exception, exception.getMessage());
         return result;
     }
 
