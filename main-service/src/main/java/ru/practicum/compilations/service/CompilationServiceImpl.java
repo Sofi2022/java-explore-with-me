@@ -11,7 +11,7 @@ import ru.practicum.compilations.model.Compilation;
 import ru.practicum.compilations.repository.CompilationsRepository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.service.EventService;
-import ru.practicum.exception.NotFoundException;
+import ru.practicum.NotFoundException;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;

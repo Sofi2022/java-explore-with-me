@@ -1,4 +1,4 @@
-package ru.practicum.exception;
+package ru.practicum;
 
 public class NotFoundException extends RuntimeException {
 

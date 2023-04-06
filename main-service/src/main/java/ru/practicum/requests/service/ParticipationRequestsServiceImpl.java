@@ -12,8 +12,8 @@ import ru.practicum.requests.mapper.ParticipationRequestsMapper;
 import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.requests.repository.ParticipationRequestsRepository;
 import ru.practicum.state.State;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.RequestAlreadyExists;
+import ru.practicum.NotFoundException;
+import ru.practicum.RequestAlreadyExists;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
