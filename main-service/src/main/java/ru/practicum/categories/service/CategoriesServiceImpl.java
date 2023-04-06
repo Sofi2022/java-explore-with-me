@@ -2,7 +2,6 @@ package ru.practicum.categories.service;
 
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -60,12 +59,13 @@ public class CategoriesServiceImpl implements CategoriesService {
     public ResponseCategoryDto update(CategoryDto category, Long catId) {
         Category savedCategory = categoriesRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Такой категории нет " + catId));
-        try {
+        Optional<List<Category>> catWithSameName = categoriesRepository.findByName(category.getName());
+        if (catWithSameName.get().size() != 0) {
+            throw new RequestAlreadyExists("Категория с таким именем уже существует: " + category.getName());
+        } else {
             savedCategory.setName(category.getName());
             Category updatedCategory = categoriesRepository.save(savedCategory);
             return categoriesMapper.toDto(updatedCategory);
-        } catch (DataIntegrityViolationException exception) {
-            throw new DataIntegrityViolationException("Такое имя уже есть: " + category.getName());
         }
     }
 

@@ -45,13 +45,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintExistxception(final ConstraintViolationException e) {
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleConstraintException(final ConstraintViolationException e) {
         log.error(e.getMessage());
         return new ErrorResponse(
                 new Date(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
                 e.getMessage()
         );
     }
