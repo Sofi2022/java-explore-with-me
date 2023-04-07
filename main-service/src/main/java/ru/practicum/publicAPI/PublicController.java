@@ -10,6 +10,7 @@ import ru.practicum.compilations.CompilationDto;
 import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.events.EventFullDto;
 import ru.practicum.events.EventShortDto;
+import ru.practicum.events.model.EventSort;
 import ru.practicum.events.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,11 +53,12 @@ public class PublicController {
                                                  @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                                  @RequestParam(name = "onlyAvailable", defaultValue = "false")
                                                      Boolean onlyAvailable, @RequestParam(name = "sort", required = false)
-                                                     String sort, @RequestParam(name = "from", defaultValue = "0")
+                                                     EventSort sorted, @RequestParam(name = "from", defaultValue = "0")
                                                      Integer from, @RequestParam(name = "size", defaultValue = "10")
                                                      Integer size, HttpServletRequest request) {
         log.info("Public: Вызван метод getEventsFiltered");
-        List<EventShortDto> result =  eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size, request);
+        List<EventShortDto> result =  eventService.getEventsFiltered(text, categoriesIds, paid, rangeStart, rangeEnd,
+                onlyAvailable, sorted, from, size, request);
         stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
         return result;
 

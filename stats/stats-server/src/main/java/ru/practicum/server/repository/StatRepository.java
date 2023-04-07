@@ -32,4 +32,12 @@ public interface StatRepository extends JpaRepository<EndpointHit, Integer> {
     List<ViewState> findAllByTimestampBetweenUnique(@Param("start") LocalDateTime start,
                                               @Param("end") LocalDateTime end,
                                               @Param("uris") List<String> uris);
+
+    @Query("select new  ru.practicum.server.model.ViewState(e.app, e.uri, count(distinct e.ip)) " +
+            "from EndpointHit as e " +
+            "where e.timestamp between :start and :end " +
+            "group by e.uri, e.app " +
+            "order by count(e.ip) desc ")
+    List<ViewState> findAllByTimestampBetweenUniqueNullUris(@Param("start") LocalDateTime start,
+                                                    @Param("end") LocalDateTime end);
 }

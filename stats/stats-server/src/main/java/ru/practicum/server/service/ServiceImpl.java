@@ -12,7 +12,6 @@ import ru.practicum.server.repository.StatRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,12 +22,9 @@ public class ServiceImpl implements StatService {
 
     private final StatRepository statRepository;
 
-    private static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+    private final StatMapper statMapper = Mappers.getMapper(StatMapper.class);
 
-    private StatMapper statMapper = Mappers.getMapper(StatMapper.class);
-
-    private ViewStateMapper viewStateMapper = Mappers.getMapper(ViewStateMapper.class);
+    private final ViewStateMapper viewStateMapper = Mappers.getMapper(ViewStateMapper.class);
 
     @Override
     public EndpointHitDto createEndpoint(EndpointHitDto endpointHitDto) {
@@ -41,9 +37,14 @@ public class ServiceImpl implements StatService {
         if (unique) {
 
           List<ViewState> uniqueStates =  statRepository.findAllByTimestampBetweenUnique(start, end, uris);
-          return uniqueStates.stream().map(viewState -> viewStateMapper.toDto(viewState)).collect(Collectors.toList());
+          return uniqueStates.stream().map(viewStateMapper::toDto).collect(Collectors.toList());
+        }
+
+        if (uris == null) {
+            List<ViewState> uniqueStates =  statRepository.findAllByTimestampBetweenUniqueNullUris(start, end);
+            return uniqueStates.stream().map(viewStateMapper::toDto).collect(Collectors.toList());
         }
         List<ViewState> states = statRepository.findAllByTimestampBetween(start, end, uris);
-        return states.stream().map(viewState -> viewStateMapper.toDto(viewState)).collect(Collectors.toList());
+        return states.stream().map(viewStateMapper::toDto).collect(Collectors.toList());
     }
 }

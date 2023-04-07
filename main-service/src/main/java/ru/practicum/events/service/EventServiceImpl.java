@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StateClient;
 import ru.practicum.events.*;
+import ru.practicum.events.model.EventSort;
 import ru.practicum.stat.ViewStateDto;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
@@ -195,62 +196,30 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventShortDto> getEventsFiltered(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
-                                                 String rangeEnd, Boolean onlyAvailable, String sort, Integer from,
+                                                 String rangeEnd, Boolean onlyAvailable, EventSort sorted, Integer from,
                                                  Integer size, HttpServletRequest request) {
-
-        log.info("PARAMS: " + text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        log.info("PARAMS: " + text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sorted, from, size);
 
         LocalDateTime start = null;
         LocalDateTime end = null;
         if (rangeStart == null) {
             start = LocalDateTime.now();
-        } else if (rangeEnd == null) {
+        }
+        if (rangeEnd == null) {
             end = LocalDateTime.now();
         } else {
             start = LocalDateTime.parse(rangeStart, formatter);
             end = LocalDateTime.parse(rangeEnd, formatter);
         }
 
-        Page<Event> events = null;
-        List<Event> eventsFromRepo;
 
-        if (categoriesIds.size() == 0 && sort.equals("EVENT_DATE")) {
-            events = eventsRepository.findAllEventsFilteredWithPageWithoutCategoryEventDateAsc(pageRequest, text, start, end);
-        }
-        if (categoriesIds.size() == 0 && sort.equals("VIEWS")) {
-            events = eventsRepository.findAllEventsFilteredWithPageWithoutCategoryViewsAsc(pageRequest, text, start, end);
-        }
-        if (sort == null) {
-            events = eventsRepository.findAllByIds(pageRequest, categoriesIds);
-        } else {
-            if (categoriesIds.size() != 0 && sort.equals("EVENT_DATE")) {
-                events = eventsRepository.findAllEventsFilteredWithCategoriesAndDateTimeAsc(pageRequest, text,
-                        categoriesIds, start, end);
-            }
-            if (categoriesIds.size() != 0 && sort.equals("VIEWS")) {
-                events = eventsRepository.findAllEventsFilteredWithCategoriesAndViewsAsc(pageRequest, text, categoriesIds, start, end);
-            }
+        List<Event> result = eventsRepository.searchByParamsPublic(text, categoriesIds, paid, start, end,
+                onlyAvailable, sorted, from, size);
+
+        if (result.size() == 0) {
+            return Collections.emptyList();
         }
 
-        eventsFromRepo = events.getContent();
-        List<Event> result;
-
-
-        if (paid) {
-            result = eventsFromRepo.stream().filter(Event::getPaid).collect(Collectors.toList());
-        } else {
-            result = eventsFromRepo.stream().filter((event -> !event.getPaid())).collect(Collectors.toList());
-        }
-
-        if (onlyAvailable) {
-            result = eventsFromRepo.stream().filter((event -> event.getConfirmedRequests() < event.getParticipantLimit()))
-                    .collect(Collectors.toList());
-        }
-
-        //stateClient.postHit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
 
         Set<Long> eventIds = result.stream().map(Event::getId).collect(Collectors.toSet());
         Map<Long, Long> viewStatsMap = stateClient.getSetViewsByEventId(eventIds);
@@ -261,8 +230,6 @@ public class EventServiceImpl implements EventService {
                 eventFullDto.setViews(viewStatsMap.getOrDefault(eventFullDto.getId(), 0L)));
 
         return eventShort;
-
-        //return eventsMapper.toListShortDto(result);
     }
 
 

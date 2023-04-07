@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EventsRepository extends JpaRepository<Event, Long> {
+public interface EventsRepository extends CustomEventRepository, JpaRepository<Event, Long> {
 
 
     @Query("select e from Event e join e.initiator join e.category where e.initiator.id in :userIds and " +

@@ -2,6 +2,7 @@ package ru.practicum.events.service;
 
 import ru.practicum.events.*;
 import ru.practicum.events.model.Event;
+import ru.practicum.events.model.EventSort;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,7 +21,7 @@ public interface EventService {
     List<EventShortDto> getEventsByUserWithPage(Long userId, Integer from, Integer size);
 
     List<EventShortDto> getEventsFiltered(String text, List<Long> categoriesIds, Boolean paid, String rangeStart,
-                                          String rangeEnd, Boolean onlyAvailable, String sort, Integer from, Integer size,
+                                          String rangeEnd, Boolean onlyAvailable, EventSort sorted, Integer from, Integer size,
                                           HttpServletRequest request);
 
     EventFullDto getFullEventById(Long eventId, HttpServletRequest request);

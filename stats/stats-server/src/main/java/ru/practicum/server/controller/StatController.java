@@ -36,6 +36,7 @@ public class StatController {
                                        @RequestParam(name = "end") String end,
                                        @RequestParam(name = "uris", required = false) List<String> uris,
                                        @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
+        log.info("Stats: Вызван метод getStats с параметрами {}, {}, {}, {} :", start, end, uris, unique);
         return service.getStats(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), formatter),
                 LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), formatter), uris, unique);
     }
