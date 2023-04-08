@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.StateClient;
 import ru.practicum.events.*;
 import ru.practicum.events.model.EventSort;
-import ru.practicum.stat.ViewStateDto;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.mapper.CategoriesMapper;
 import ru.practicum.categories.model.Category;
@@ -24,8 +23,8 @@ import ru.practicum.locations.model.Location;
 import ru.practicum.locations.LocationRepository;
 import ru.practicum.state.State;
 import ru.practicum.user.UserShortDto;
-import ru.practicum.NotFoundException;
-import ru.practicum.RequestAlreadyExists;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RequestAlreadyExists;
 import ru.practicum.user.mapper.UserMapper;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
@@ -35,6 +34,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.common.CommonConstant.TIME_PATTERN;
 
 @Service
 @Slf4j
@@ -60,9 +61,6 @@ public class EventServiceImpl implements EventService {
     private final EventsUpdateMapper eventsUpdateMapper;
 
     private final StateClient stateClient;
-
-    public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
 
     @Transactional
@@ -101,7 +99,6 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest event) {
-        EventFullDto result;
         Event eventFromDb = eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException(
                 "Такого события нет " + eventId));
         if (event.getEventDate() != null) {
@@ -126,11 +123,9 @@ public class EventServiceImpl implements EventService {
             }
         }
 
-        Event event1 = eventsUpdateMapper.updateEventByAdmin(event, eventFromDb);
-        Event event2 = eventsRepository.save(eventFromDb);
-        result = eventsMapper.toDto(eventFromDb);
-        System.out.println("RESULT: " + result);
-        return result;
+        eventsUpdateMapper.updateEventByAdmin(event, eventFromDb);
+        eventsRepository.save(eventFromDb);
+        return eventsMapper.toDto(eventFromDb);
     }
 
 
@@ -145,18 +140,17 @@ public class EventServiceImpl implements EventService {
         }
 
         List<State> stateList = states.stream().map(State::valueOf).collect(Collectors.toList());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         LocalDateTime start;
         if (!(rangeStart.isEmpty())) {
-            start = LocalDateTime.parse(rangeStart, formatter);
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(TIME_PATTERN));
         } else {
             start = LocalDateTime.now().plusYears(5);
         }
 
         LocalDateTime end;
         if (!(rangeEnd.isEmpty())) {
-            end = LocalDateTime.parse(rangeEnd, formatter);
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(TIME_PATTERN));
         } else {
             end = LocalDateTime.now().plusYears(5);
         }
@@ -201,15 +195,15 @@ public class EventServiceImpl implements EventService {
         log.info("PARAMS: " + text, categoriesIds, paid, rangeStart, rangeEnd, onlyAvailable, sorted, from, size);
 
         LocalDateTime start = null;
-        LocalDateTime end = null;
+        LocalDateTime end;
         if (rangeStart == null) {
             start = LocalDateTime.now();
         }
         if (rangeEnd == null) {
             end = LocalDateTime.now();
         } else {
-            start = LocalDateTime.parse(rangeStart, formatter);
-            end = LocalDateTime.parse(rangeEnd, formatter);
+            start = LocalDateTime.parse(rangeStart, DateTimeFormatter.ofPattern(TIME_PATTERN));
+            end = LocalDateTime.parse(rangeEnd, DateTimeFormatter.ofPattern(TIME_PATTERN));
         }
 
 
@@ -233,49 +227,6 @@ public class EventServiceImpl implements EventService {
     }
 
 
-    private LocalDateTime validateStartTime(LocalDateTime rangeStart) {
-        if (rangeStart == null) {
-            rangeStart = LocalDateTime.now().minusYears(5);
-        }
-        return rangeStart;
-    }
-
-    private LocalDateTime validateEndTime(LocalDateTime rangeEnd) {
-        if (rangeEnd == null) {
-            rangeEnd = LocalDateTime.now().plusYears(5);
-        }
-        return rangeEnd;
-    }
-
-
-    private List<ViewStateDto> getViewsForPublicEvents(LocalDateTime rangeStart, LocalDateTime rangeEnd, List<Event> events) {
-        LocalDateTime start = validateStartTime(rangeStart);
-        LocalDateTime end = validateEndTime(rangeEnd);
-
-        Boolean unique = false;
-
-//        List<String> uris = events.stream().map(event -> "/events/" + event.getId())
-//                .collect(Collectors.toList());
-        //List<ViewStateDto> views = stateClient.getStats(start.toString(), end.toString(), uris, unique);
-
-        return null;
-    }
-
-
-    private List<ViewStateDto> getViewsForAdminEvents(LocalDateTime rangeStart, LocalDateTime rangeEnd, List<Event> events) {
-        LocalDateTime start = validateStartTime(rangeStart);
-        LocalDateTime end = validateEndTime(rangeEnd);
-
-        Boolean unique = false;
-
-        List<String> uris = events.stream().map(event -> "/admin/events/" + event.getId())
-                .collect(Collectors.toList());
-        //List<ViewStateDto> views = stateClient.getStats(start, end, uris, unique);
-
-        return null;
-    }
-
-
     @Override
     public EventFullDto getFullEventById(Long eventId, HttpServletRequest request) {
         Optional<Event> event = eventsRepository.findEventByIdAndStatePublished(eventId);
@@ -286,7 +237,6 @@ public class EventServiceImpl implements EventService {
             EventFullDto result = eventsMapper.toDto(event.get());
             result.setViews(views);
             return result;
-            //return eventsMapper.toDto(event.get());
         }
     }
 
@@ -312,8 +262,8 @@ public class EventServiceImpl implements EventService {
                     "статус события = " + eventFromDb.getState());
         }
 
-        Event event1 = eventsUpdateMapper.updateEventByUser(event, eventFromDb);
-        Event event2 = eventsRepository.save(eventFromDb);
+        eventsUpdateMapper.updateEventByUser(event, eventFromDb);
+        eventsRepository.save(eventFromDb);
         return eventsMapper.toDto(eventFromDb);
     }
 
@@ -326,11 +276,5 @@ public class EventServiceImpl implements EventService {
 
     private void validateUser(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет " + userId));
-    }
-
-
-    private void validateEvent(Long eventId) {
-        eventsRepository.findById(eventId).orElseThrow(() -> new NotFoundException(
-                "Такого события нет " + eventId));
     }
 }

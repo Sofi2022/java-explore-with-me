@@ -13,8 +13,8 @@ import ru.practicum.categories.model.Category;
 import ru.practicum.categories.repository.CategoriesRepository;
 import ru.practicum.events.model.Event;
 import ru.practicum.events.repository.EventsRepository;
-import ru.practicum.NotFoundException;
-import ru.practicum.RequestAlreadyExists;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RequestAlreadyExists;
 
 import javax.transaction.Transactional;
 import java.util.List;

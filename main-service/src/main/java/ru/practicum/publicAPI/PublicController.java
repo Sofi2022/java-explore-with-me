@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.StateClient;
 import ru.practicum.categories.ResponseCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.comment.CommentDto;
+import ru.practicum.comment.service.CommentService;
 import ru.practicum.compilations.CompilationDto;
 import ru.practicum.compilations.service.CompilationService;
 import ru.practicum.events.EventFullDto;
@@ -28,6 +30,8 @@ public class PublicController {
     private final EventService eventService;
 
     private final CompilationService compilService;
+
+    private final CommentService commentService;
 
     private final StateClient stateClient;
 
@@ -89,5 +93,17 @@ public class PublicController {
     Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Public: Вызван метод getCompilsWithParams pinned {} from {} size {} ", pinned, from, size);
         return compilService.getCompilsWithParams(pinned, from, size);
+    }
+
+
+    @GetMapping("/comments/{comId}")
+    public CommentDto getCommentById(@PathVariable Long comId) {
+        return commentService.getCommentById(comId);
+    }
+
+
+    @GetMapping("/comments")
+    public List<CommentDto> getAllComments() {
+        return commentService.getAllComments();
     }
 }

@@ -17,10 +17,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.practicum.common.CommonConstant.TIME_PATTERN;
+
 @Service
 public class StateClient extends BaseClient {
 
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final ObjectMapper mapper = new ObjectMapper();
     private final TypeReference<List<ViewStateDto>> mapType = new TypeReference<>() {};
 
@@ -54,8 +55,8 @@ public class StateClient extends BaseClient {
 
     public Long getViewsByEventId(Long eventId) {
         Map<String, Object> parameters = Map.of(
-                "start", LocalDateTime.now().minusYears(1000).format(dateTimeFormatter),
-                "end", LocalDateTime.now().plusYears(1000).format(dateTimeFormatter),
+                "start", LocalDateTime.now().minusYears(1000).format(DateTimeFormatter.ofPattern(TIME_PATTERN)),
+                "end", LocalDateTime.now().plusYears(1000).format(DateTimeFormatter.ofPattern(TIME_PATTERN)),
                 "uris", toString(List.of("/events/" + eventId)),
                 "unique", Boolean.FALSE
         );
@@ -67,8 +68,8 @@ public class StateClient extends BaseClient {
 
     public Map<Long, Long> getSetViewsByEventId(Set<Long> eventIds) {
         Map<String, Object> parameters = Map.of(
-                "start", LocalDateTime.now().minusYears(1000).format(dateTimeFormatter),
-                "end", LocalDateTime.now().plusYears(1000).format(dateTimeFormatter),
+                "start", LocalDateTime.now().minusYears(1000).format(DateTimeFormatter.ofPattern(TIME_PATTERN)),
+                "end", LocalDateTime.now().plusYears(1000).format(DateTimeFormatter.ofPattern(TIME_PATTERN)),
                 "uris", (eventIds.stream().map(id -> "/events/" + id).collect(Collectors.toList())),
                 "unique", Boolean.FALSE
         );

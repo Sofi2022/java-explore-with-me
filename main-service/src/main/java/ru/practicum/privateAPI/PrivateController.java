@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.comment.CommentDto;
+import ru.practicum.comment.NewCommentDto;
+import ru.practicum.comment.service.CommentService;
 import ru.practicum.events.EventFullDto;
 import ru.practicum.events.EventShortDto;
 import ru.practicum.events.NewEventDto;
@@ -28,6 +31,8 @@ public class PrivateController {
 
     private final EventService eventService;
 
+    private final CommentService commentService;
+
 
     @PostMapping("users/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
@@ -42,7 +47,6 @@ public class PrivateController {
     public ParticipationRequestDto addRequest(@PathVariable Long userId, @RequestParam(name = "eventId") Long eventId) {
         log.info("Private: Вызван метод addRequest, userId {}", userId);
         ParticipationRequestDto result = requestService.addRequest(userId, eventId);
-        System.out.println("RESULT= " + result);
         return result;
     }
 
@@ -92,5 +96,21 @@ public class PrivateController {
     Long eventId, @Valid @RequestBody EventRequestStatusUpdateRequest request) {
         log.info("Private: Вызван метод confirmOrRejectRequestsByUser, userId eventId {} {}", userId, eventId);
         return requestService.confirmOrRejectRequestsByUser(userId, eventId, request);
+    }
+
+
+    @PostMapping("/events/{eventId}/comment/{userId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto addComment(@PathVariable Long eventId, @Valid @RequestBody NewCommentDto comment,
+                                 @PathVariable Long userId) {
+        log.info("Private: Вызван метод addComment, userId eventId {} {}", userId, eventId);
+        return commentService.addComment(eventId, comment, eventId);
+    }
+
+
+    @GetMapping("/comments/all/{userId}")
+    public List<CommentDto> getAllUserComments(@PathVariable Long userId) {
+        log.info("Private: Вызван метод getAllUserComments, userId {}", userId);
+        return commentService.getAllUserComments(userId);
     }
 }

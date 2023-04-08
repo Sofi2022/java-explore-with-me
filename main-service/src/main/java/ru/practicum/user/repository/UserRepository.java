@@ -14,12 +14,19 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("select u from User u where u.id in :userIds order by u.id desc")
+    @Query("SELECT u FROM User u " +
+            "WHERE u.id IN :userIds " +
+            "ORDER BY u.id " +
+            "DESC")
     List<User> findAllByIdContains(@Param ("userIds") List<Long> userIds);
 
-    @Query("select u from User u where u.id in :userIds order by u.id desc")
+    @Query("SELECT u FROM User u " +
+            "WHERE u.id IN :userIds " +
+            "ORDER BY u.id " +
+            "DESC")
     Page<User> findAllByIdContainsWithPage(PageRequest pageRequest, @Param ("userIds") List<Long> userIds);
 
-    @Query("select u from User u where u.name like :name")
+    @Query("SELECT u FROM User u " +
+            "WHERE u.name LIKE :name")
     Optional<List<User>> findByName(String name);
 }

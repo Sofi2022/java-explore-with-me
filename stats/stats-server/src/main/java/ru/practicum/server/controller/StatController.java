@@ -15,14 +15,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static ru.practicum.common.CommonConstant.TIME_PATTERN;
+
 @Slf4j
 @RestController
 @RequestMapping
 @RequiredArgsConstructor
 public class StatController {
 
-    public static final String TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(TIME_PATTERN);
+
     private final StatService service;
 
     @PostMapping("/hit")
@@ -37,7 +38,9 @@ public class StatController {
                                        @RequestParam(name = "uris", required = false) List<String> uris,
                                        @RequestParam(name = "unique", defaultValue = "false") Boolean unique) {
         log.info("Stats: Вызван метод getStats с параметрами {}, {}, {}, {} :", start, end, uris, unique);
-        return service.getStats(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), formatter),
-                LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), formatter), uris, unique);
+        return service.getStats(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8),
+                        DateTimeFormatter.ofPattern(TIME_PATTERN)),
+                LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), DateTimeFormatter.ofPattern(TIME_PATTERN)),
+                uris, unique);
     }
 }

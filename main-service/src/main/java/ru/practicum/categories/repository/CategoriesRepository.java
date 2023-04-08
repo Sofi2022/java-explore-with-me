@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface CategoriesRepository extends JpaRepository<Category, Long> {
 
 
-    @Query("select c from Category c where c.name LIKE :name")
+    @Query("SELECT c from Category c " +
+            "WHERE c.name LIKE :name")
     Optional<List<Category>> findByName(String name);
 }

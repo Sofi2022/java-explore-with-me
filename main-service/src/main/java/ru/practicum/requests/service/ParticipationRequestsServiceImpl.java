@@ -12,8 +12,8 @@ import ru.practicum.requests.mapper.ParticipationRequestsMapper;
 import ru.practicum.requests.model.ParticipationRequest;
 import ru.practicum.requests.repository.ParticipationRequestsRepository;
 import ru.practicum.state.State;
-import ru.practicum.NotFoundException;
-import ru.practicum.RequestAlreadyExists;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.RequestAlreadyExists;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
@@ -125,25 +125,27 @@ public class ParticipationRequestsServiceImpl implements RequestService {
         List<ParticipationRequest> confirmedRequests = new ArrayList<>();
         List<ParticipationRequest> rejectedRequests = new ArrayList<>();
 
+        List<ParticipationRequest> updatedRequests = new ArrayList<>();
 
         for (ParticipationRequest req : requests) {
                 if (status.equals("CONFIRMED") && req.getState().equals(State.PENDING)) {
                     if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
                         req.setState(State.REJECTED);
-                        participationRequestsRepository.save(req);
+                        updatedRequests.add(req);
                         rejectedRequests.add(req);
                     }
                     req.setState(State.CONFIRMED);
-                    participationRequestsRepository.save(req);
+                    updatedRequests.add(req);
                     event.setConfirmedRequests(event.getConfirmedRequests() + 1);
                     eventsRepository.save(event);
                     confirmedRequests.add(req);
                 }
                 if (status.equals("REJECTED") && req.getState().equals(State.PENDING)) {
                     req.setState(State.REJECTED);
-                    participationRequestsRepository.save(req);
+                    updatedRequests.add(req);
                     rejectedRequests.add(req);
                 }
+               participationRequestsRepository.saveAll(updatedRequests);
             }
 
         List<ParticipationRequestDto> con = partMapper.toListDto(confirmedRequests);

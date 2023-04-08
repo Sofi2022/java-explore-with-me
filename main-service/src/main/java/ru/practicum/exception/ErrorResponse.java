@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Value;

@@ -17,59 +17,100 @@ import java.util.Optional;
 public interface EventsRepository extends CustomEventRepository, JpaRepository<Event, Long> {
 
 
-    @Query("select e from Event e join e.initiator join e.category where e.initiator.id in :userIds and " +
-            "e.state in :states and e.category.id in :categories and e.eventDate between :rangeStart and :rangeEnd")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.initiator " +
+            "JOIN e.category " +
+            "WHERE e.initiator.id IN :userIds " +
+            "AND e.state IN :states " +
+            "AND e.category.id IN :categories " +
+            "AND e.eventDate BETWEEN :rangeStart AND :rangeEnd")
     Page<Event> findAllWithAllParameters(@Param("userIds") List<Long> userIds, @Param("states") List<State> states,
                                          @Param("categories") List<Long> categories, @Param("rangeStart") LocalDateTime rangeStart,
                                          @Param("rangeEnd") LocalDateTime rangeEnd, PageRequest pageRequest);
 
-    @Query("select e from Event e join e.category where e.category.id in :categories and e.state in :states and " +
-            "e.eventDate between:rangeStart and:rangeEnd")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.category " +
+            "WHERE e.category.id IN :categories " +
+            "AND e.state IN :states " +
+            "AND e.eventDate BETWEEN:rangeStart AND:rangeEnd")
     Page<Event> findAllEventsWithoutIdList(@Param("categories") List<Long> categories, @Param("states") List<State> states,
                                            @Param("rangeStart") LocalDateTime rangeStart,
                                          @Param("rangeEnd") LocalDateTime rangeEnd, PageRequest pageRequest);
 
-    @Query("select e from Event e join e.initiator join e.category where e.initiator.id = :userId and e.id = :eventId")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.initiator " +
+            "JOIN e.category " +
+            "WHERE e.initiator.id = :userId " +
+            "AND e.id = :eventId")
     List<Event> findAllByUser(@Param("userId") Long userId, @Param("eventId") Long eventId);
 
-    @Query("select e from Event e join e.initiator join e.category where e.initiator.id = :userId")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.initiator " +
+            "JOIN e.category " +
+            "WHERE e.initiator.id = :userId")
     Page<Event> findAllByUserWithPage(@Param("userId") Long userId, PageRequest pageRequest);
 
-    @Query("select e from Event e where e.id = :id and e.state ='PUBLISHED'")
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.id = :id " +
+            "AND e.state ='PUBLISHED'")
     Optional<Event> findEventByIdAndStatePublished(@Param("id") Long eventId);
 
 
-    @Query("select e from Event e join e.category where lower(e.annotation) like lower(:text) or lower(e.description) " +
-            "like lower(:text) and e.category.id in :categoriesIds and e.eventDate between :start and " +
-            ":end and e.state = 'PUBLISHED' order by e.eventDate asc")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.category " +
+            "WHERE LOWER(e.annotation) LIKE LOWER(:text) OR LOWER(e.description) " +
+            "LIKE LOWER(:text) " +
+            "AND e.category.id IN :categoriesIds " +
+            "AND e.eventDate BETWEEN :start AND :end " +
+            "AND e.state = 'PUBLISHED' " +
+            "ORDER BY e.eventDate ASC")
     Page<Event> findAllEventsFilteredWithCategoriesAndDateTimeAsc(PageRequest pageRequest, @Param("text") String text,
                                                                   @Param("categoriesIds")
     List<Long> categoriesIds, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 
-    @Query("select e from Event e join e.category where lower(e.annotation) like lower(:text) or lower(e.description) " +
-            "like lower(:text) and e.category.id in :categoriesIds and e.eventDate between :start and " +
-            ":end and e.state = 'PUBLISHED' order by e.views asc")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.category " +
+            "WHERE LOWER(e.annotation) LIKE LOWER(:text) " +
+            "OR LOWER(e.description) LIKE LOWER(:text) " +
+            "AND e.category.id IN :categoriesIds " +
+            "AND e.eventDate BETWEEN :start AND :end " +
+            "AND e.state = 'PUBLISHED' " +
+            "ORDER BY e.views ASC")
     Page<Event> findAllEventsFilteredWithCategoriesAndViewsAsc(PageRequest pageRequest, @Param("text") String text,
                                                                @Param("categoriesIds") List<Long> categoriesIds,
                                                                   @Param("start") LocalDateTime start, @Param("end")
                                                                LocalDateTime end);
 
-    @Query("select e from Event e where lower(e.annotation) like lower(:text) or lower(e.description) like lower(:text) " +
-            "and e.paid = false and e.eventDate between :start and :end and e.state = 'PUBLISHED' order by e.eventDate asc")
+    @Query("SELECT e FROM Event e " +
+            "WHERE LOWER(e.annotation) LIKE LOWER(:text) " +
+            "OR LOWER(e.description) LIKE LOWER(:text) " +
+            "AND e.paid = FALSE " +
+            "AND e.eventDate BETWEEN :start AND :end " +
+            "AND e.state = 'PUBLISHED' " +
+            "ORDER BY e.eventDate ASC")
     Page<Event> findAllEventsFilteredWithPageWithoutCategoryEventDateAsc(PageRequest pageRequest, @Param("text") String text,
                                                              @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("select e from Event e where lower(e.annotation) like lower(:text) or lower(e.description) like lower(:text)" +
-            " and e.paid = false and e.eventDate between :start and :end and e.state = 'PUBLISHED' order by e.views asc")
+    @Query("SELECT e FROM Event e " +
+            "WHERE LOWER(e.annotation) LIKE LOWER(:text) " +
+            "OR LOWER(e.description) LIKE LOWER(:text)" +
+            " AND e.paid = FALSE " +
+            "AND e.eventDate BETWEEN :start AND :end " +
+            "AND e.state = 'PUBLISHED' " +
+            "ORDER BY e.views ASC")
     Page<Event> findAllEventsFilteredWithPageWithoutCategoryViewsAsc(PageRequest pageRequest, @Param("text") String text,
                                                                          @Param("start") LocalDateTime start,
                                                                      @Param("end") LocalDateTime end);
 
-    @Query("select e from Event e join e.category where e.category.id in :categoriesIds")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.category " +
+            "WHERE e.category.id IN :categoriesIds")
     Page<Event> findAllByIds(PageRequest pageRequest, List<Long> categoriesIds);
 
 
-    @Query("select e from Event e join e.category where e.category.id = :catId")
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.category " +
+            "WHERE e.category.id = :catId")
     Optional<List<Event>> findAllByCategoryId(Long catId);
 }

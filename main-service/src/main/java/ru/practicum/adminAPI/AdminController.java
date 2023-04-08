@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.StateClient;
 import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.ResponseCategoryDto;
 import ru.practicum.categories.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
+import ru.practicum.comment.CommentDto;
+import ru.practicum.comment.UpdateCommentDto;
+import ru.practicum.comment.service.CommentService;
 import ru.practicum.compilations.CompilationDto;
 import ru.practicum.compilations.NewCompilationDto;
 import ru.practicum.compilations.UpdateCompilationRequest;
@@ -38,7 +40,8 @@ public class AdminController {
 
     private final CompilationService compilService;
 
-    private StateClient stateClient;
+
+    private final CommentService commentService;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -93,14 +96,15 @@ public class AdminController {
         return eventService.updateEventByAdmin(eventId, event);
     }
 
+
     @GetMapping("/events")
     public List<EventFullDto> searchEvents(@RequestParam(name = "users", required = false) List<Long> userIds,
                                            @RequestParam(name = "states", required = false)
     List<String> states, @RequestParam(name = "categories", required = false) List<Long> categories,
                                            @RequestParam(name = "rangeStart", required = false)
                                            String rangeStart, @RequestParam(name = "rangeEnd", required = false)
-    String rangeEnd, @RequestParam(name = "from",
-            defaultValue = "0") Integer from, @RequestParam(name = "size", defaultValue = "10") Integer size, HttpServletRequest request) {
+    String rangeEnd, @RequestParam(name = "from", defaultValue = "0") Integer from, @RequestParam(name = "size",
+            defaultValue = "10") Integer size, HttpServletRequest request) {
         log.info("Admin: Вызван метод searchEvents ");
         return eventService.searchEvents(userIds, states, categories, rangeStart, rangeEnd, from, size, request);
     }
@@ -126,5 +130,12 @@ public class AdminController {
     public CompilationDto updateCompilation(@PathVariable Long compId, @RequestBody UpdateCompilationRequest compil) {
         log.info("Admin: Вызван метод updateCompilation " + compId);
         return compilService.updateCompilation(compId, compil);
+    }
+
+
+    @PatchMapping("/comment/{comId}")
+    public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody UpdateCommentDto comment) {
+        log.info("Admin: Вызван метод updateComment {}", comId);
+        return commentService.updateComment(comId, comment);
     }
 }
