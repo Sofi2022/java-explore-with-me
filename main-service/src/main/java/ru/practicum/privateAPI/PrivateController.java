@@ -113,4 +113,11 @@ public class PrivateController {
         log.info("Private: Вызван метод getAllUserComments, userId {}", userId);
         return commentService.getAllUserComments(userId);
     }
+
+
+    @DeleteMapping("comments/{userId}/{comId}")
+    public void deleteComment(@PathVariable Long userId, @PathVariable Long comId) {
+        log.info("Private: Вызван метод deleteComment, userId {} {} ", userId, comId);
+        commentService.deleteComment(userId, comId);
+    }
 }

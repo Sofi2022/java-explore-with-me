@@ -28,7 +28,7 @@ public class Comment {
     private String text;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "author_id")
     private User author;
 
     @ManyToOne(optional = false)
@@ -37,5 +37,5 @@ public class Comment {
 
     @Timestamp
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdOn;
+    private LocalDateTime created;
 }

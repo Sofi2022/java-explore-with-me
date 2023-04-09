@@ -108,6 +108,11 @@ public interface EventsRepository extends CustomEventRepository, JpaRepository<E
             "WHERE e.category.id IN :categoriesIds")
     Page<Event> findAllByIds(PageRequest pageRequest, List<Long> categoriesIds);
 
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.id = :eventId " +
+            "AND e.initiator.id = :userId")
+    Optional<Event> findByIdAndInitId(@Param("eventId") Long eventId, @Param("userId") Long userId);
+
 
     @Query("SELECT e FROM Event e " +
             "JOIN e.category " +

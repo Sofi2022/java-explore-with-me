@@ -133,7 +133,7 @@ public class AdminController {
     }
 
 
-    @PatchMapping("/comment/{comId}")
+    @PatchMapping("/comments/{comId}")
     public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody UpdateCommentDto comment) {
         log.info("Admin: Вызван метод updateComment {}", comId);
         return commentService.updateComment(comId, comment);

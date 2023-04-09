@@ -1,13 +1,10 @@
 package ru.practicum.comment;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import ru.practicum.events.EventShortDto;
-import ru.practicum.user.UserDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import javax.validation.constraints.Size;
 
 @Valid
 @Getter
@@ -17,14 +14,7 @@ import java.time.LocalDateTime;
 @ToString
 public class UpdateCommentDto {
 
-
     @NotBlank
+    @Size(min = 20, max = 7000)
     private String text;
-
-    private UserDto author;
-
-    private EventShortDto event;
-
-    @CreationTimestamp
-    private LocalDateTime createdOn;
 }
