@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.comment.CommentDto;
 import ru.practicum.comment.NewCommentDto;
+import ru.practicum.comment.UpdateCommentDto;
 import ru.practicum.comment.service.CommentService;
 import ru.practicum.events.EventFullDto;
 import ru.practicum.events.EventShortDto;
@@ -115,9 +116,15 @@ public class PrivateController {
     }
 
 
-    @DeleteMapping("comments/{userId}/{comId}")
-    public void deleteComment(@PathVariable Long userId, @PathVariable Long comId) {
-        log.info("Private: Вызван метод deleteComment, userId {} {} ", userId, comId);
-        commentService.deleteComment(userId, comId);
+    @GetMapping("/comments/{comId}")
+    public CommentDto getCommentById(@PathVariable Long comId) {
+        return commentService.getCommentById(comId);
+    }
+
+
+    @PatchMapping("/comments/{comId}")
+    public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody UpdateCommentDto comment) {
+        log.info("Admin: Вызван метод updateComment {}", comId);
+        return commentService.updateComment(comId, comment);
     }
 }

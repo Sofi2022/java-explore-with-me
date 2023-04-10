@@ -8,8 +8,6 @@ import ru.practicum.categories.CategoryDto;
 import ru.practicum.categories.ResponseCategoryDto;
 import ru.practicum.categories.NewCategoryDto;
 import ru.practicum.categories.service.CategoriesService;
-import ru.practicum.comment.CommentDto;
-import ru.practicum.comment.UpdateCommentDto;
 import ru.practicum.comment.service.CommentService;
 import ru.practicum.compilations.CompilationDto;
 import ru.practicum.compilations.NewCompilationDto;
@@ -133,9 +131,9 @@ public class AdminController {
     }
 
 
-    @PatchMapping("/comments/{comId}")
-    public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody UpdateCommentDto comment) {
-        log.info("Admin: Вызван метод updateComment {}", comId);
-        return commentService.updateComment(comId, comment);
+    @DeleteMapping("comments/{userId}/{comId}")
+    public void deleteComment(@PathVariable Long userId, @PathVariable Long comId) {
+        log.info("Private: Вызван метод deleteComment, userId {} {} ", userId, comId);
+        commentService.deleteComment(userId, comId);
     }
 }

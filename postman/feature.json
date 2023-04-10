@@ -672,11 +672,12 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/comments/:userId/:comId",
+          "raw": "{{baseUrl}}/admin/comments/:userId/:comId",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "admin",
             "comments",
             ":userId",
             ":comId"
@@ -725,11 +726,12 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/comments/:userId/:comId",
+          "raw": "{{baseUrl}}/admin/comments/:userId/:comId",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "admin",
             "comments",
             ":userId",
             ":comId"
