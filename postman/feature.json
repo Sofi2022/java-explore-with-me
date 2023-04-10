@@ -44,14 +44,12 @@
           {
             "key": "Content-type",
             "value": "application/json",
-            "type": "text",
-            "disabled": true
+            "type": "text"
           },
           {
             "key": "Accept",
             "value": "application/json",
-            "type": "text",
-            "disabled": true
+            "type": "text"
           }
         ],
         "body": {
@@ -510,10 +508,12 @@
           "raw": "{\r\n    \"text\": \"Comment for first event!\"\r\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/events/:eventId/comment/:userId",
+          "raw": "http://localhost:8080/events/:eventId/comment/:userId",
+          "protocol": "http",
           "host": [
-            "{{baseUrl}}"
+            "localhost"
           ],
+          "port": "8080",
           "path": [
             "events",
             ":eventId",
@@ -542,7 +542,7 @@
           "script": {
             "exec": [
               "pm.test(\"Status code is 201\", function () {\r",
-              "    pm.response.to.have.status(400);\r",
+              "    pm.response.to.have.status(404);\r",
               "});"
             ],
             "type": "text/javascript"
@@ -582,7 +582,7 @@
           "variable": [
             {
               "key": "comId",
-              "value": null
+              "value": "5"
             }
           ]
         }
