@@ -44,12 +44,14 @@
           {
             "key": "Content-type",
             "value": "application/json",
-            "type": "text"
+            "type": "text",
+            "disabled": true
           },
           {
             "key": "Accept",
             "value": "application/json",
-            "type": "text"
+            "type": "text",
+            "disabled": true
           }
         ],
         "body": {
@@ -1200,7 +1202,8 @@
               "pm.expect(target).to.have.property('created');\r",
               "});\r",
               "\r",
-              " pm.expect(jsonData.length, 'Comments length').to.eql(2)\r",
+              " var jsonData = pm.response.json();\r",
+              "pm.expect(jsonData.length, 'Comments get all from user 3').to.eql(1);\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
               "    pm.expect(target.id).to.not.be.null;\r",
@@ -1268,7 +1271,8 @@
               "pm.expect(target).to.have.property('created');\r",
               "});\r",
               "\r",
-              " pm.expect(jsonData.length, 'Comments length').to.eql(3)\r",
+              " var jsonData = pm.response.json();\r",
+              "pm.expect(jsonData.length, 'Comments get all from user 3').to.eql(2);\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
               "    pm.expect(target.id).to.not.be.null;\r",
