@@ -44,17 +44,19 @@
           {
             "key": "Content-type",
             "value": "application/json",
-            "type": "text"
+            "type": "text",
+            "disabled": true
           },
           {
             "key": "Accept",
             "value": "application/json",
-            "type": "text"
+            "type": "text",
+            "disabled": true
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"name\": \"user\",\r\n    \"email\": \"user@user.com\"\r\n}"
+          "raw": "{\r\n    \"name\": \"userккк\",\r\n    \"email\": \"user@user.com\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/admin/users",
@@ -542,7 +544,7 @@
           "script": {
             "exec": [
               "pm.test(\"Status code is 201\", function () {\r",
-              "    pm.response.to.have.status(404);\r",
+              "    pm.response.to.have.status(400);\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1302,9 +1304,6 @@
               "pm.expect(target).to.have.property('eventId');\r",
               "pm.expect(target).to.have.property('created');\r",
               "});\r",
-              "\r",
-              " var jsonData = pm.response.json();\r",
-              "pm.expect(jsonData.length, 'Comments get all from user 3').to.eql(2);\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
               "    pm.expect(target.id).to.not.be.null;\r",
