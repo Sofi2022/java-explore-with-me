@@ -57,10 +57,12 @@
           "raw": "{\r\n    \"name\": \"user\",\r\n    \"email\": \"user@user.com\"\r\n}"
         },
         "url": {
-          "raw": "{{baseUrl}}/admin/users",
+          "raw": "http://localhost:8080/admin/users",
+          "protocol": "http",
           "host": [
-            "{{baseUrl}}"
+            "localhost"
           ],
+          "port": "8080",
           "path": [
             "admin",
             "users"
