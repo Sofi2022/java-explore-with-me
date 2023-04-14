@@ -113,4 +113,10 @@ public class PrivateController {
         log.info("Private: Вызван метод getAllUserComments, userId {}", userId);
         return commentService.getAllUserComments(userId);
     }
+
+
+    @GetMapping("/comments/{comId}")
+    public CommentDto getCommentById(@PathVariable Long comId) {
+        return commentService.getCommentById(comId);
+    }
 }

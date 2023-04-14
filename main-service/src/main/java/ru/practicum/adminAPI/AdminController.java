@@ -133,7 +133,14 @@ public class AdminController {
     }
 
 
-    @PatchMapping("/comment/{comId}")
+    @DeleteMapping("comments/{userId}/{comId}")
+    public void deleteComment(@PathVariable Long userId, @PathVariable Long comId) {
+        log.info("Private: Вызван метод deleteComment, userId {} {} ", userId, comId);
+        commentService.deleteComment(userId, comId);
+    }
+
+
+    @PatchMapping("/comments/{comId}")
     public CommentDto updateComment(@PathVariable Long comId, @Valid @RequestBody UpdateCommentDto comment) {
         log.info("Admin: Вызван метод updateComment {}", comId);
         return commentService.updateComment(comId, comment);

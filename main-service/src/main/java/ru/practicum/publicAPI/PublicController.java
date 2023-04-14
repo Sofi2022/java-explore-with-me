@@ -96,12 +96,6 @@ public class PublicController {
     }
 
 
-    @GetMapping("/comments/{comId}")
-    public CommentDto getCommentById(@PathVariable Long comId) {
-        return commentService.getCommentById(comId);
-    }
-
-
     @GetMapping("/comments")
     public List<CommentDto> getAllComments() {
         return commentService.getAllComments();

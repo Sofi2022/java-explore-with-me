@@ -2,7 +2,6 @@ package ru.practicum.comment;
 
 
 import lombok.*;
-import ru.practicum.events.EventShortDto;
 import ru.practicum.user.UserDto;
 
 import javax.validation.Valid;
@@ -22,7 +21,7 @@ public class CommentDto {
 
     private UserDto author;
 
-    private EventShortDto event;
+    private Long eventId;
 
-    private LocalDateTime createdOn;
+    private LocalDateTime created;
 }

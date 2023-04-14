@@ -37,4 +37,11 @@ public interface ParticipationRequestsRepository extends JpaRepository<Participa
             "AND p.state = 'CONFIRMED'")
     Optional<ParticipationRequest> findParticipationRequestByRequesterIdAndEventId(@Param("requesterId")Long requesterId,
                                                                                    @Param("eventId")Long eventId);
+
+
+    @Query("SELECT p FROM ParticipationRequest p " +
+            "JOIN FETCH p.event e " +
+            "WHERE e.id = :eventId " +
+            "AND p.state = 'CONFIRMED'")
+    List<ParticipationRequest> findConfirmedRequestsByEventId(@Param("eventId") Long eventId);
 }

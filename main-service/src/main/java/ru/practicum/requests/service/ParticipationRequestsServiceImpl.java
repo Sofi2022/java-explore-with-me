@@ -137,7 +137,6 @@ public class ParticipationRequestsServiceImpl implements RequestService {
                     req.setState(State.CONFIRMED);
                     updatedRequests.add(req);
                     event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-                    eventsRepository.save(event);
                     confirmedRequests.add(req);
                 }
                 if (status.equals("REJECTED") && req.getState().equals(State.PENDING)) {
@@ -145,14 +144,17 @@ public class ParticipationRequestsServiceImpl implements RequestService {
                     updatedRequests.add(req);
                     rejectedRequests.add(req);
                 }
-               participationRequestsRepository.saveAll(updatedRequests);
             }
+
+        participationRequestsRepository.saveAll(updatedRequests);
+        eventsRepository.save(event);
 
         List<ParticipationRequestDto> con = partMapper.toListDto(confirmedRequests);
         List<ParticipationRequestDto> rej = partMapper.toListDto(rejectedRequests);
 
         return partMapper.toRequestStatusDto(con, rej);
     }
+
 
     private void validateUser(Long userId) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Такого пользователя нет "
